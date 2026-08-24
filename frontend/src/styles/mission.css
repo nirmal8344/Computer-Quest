@@ -363,4 +363,31 @@
     gap: 12px;
     text-align: center;
   }
+  .outcome-title-complete,
+  .outcome-title-failed {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+  }
+  .outcome-stats-box {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .question-game-card {
+    padding: 12px 10px;
+  }
+  .game-option-btn {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .option-badge {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  .option-text {
+    font-size: 0.88rem;
+  }
 }

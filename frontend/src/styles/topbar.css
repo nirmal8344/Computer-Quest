@@ -162,12 +162,16 @@
   filter: brightness(1.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 820px) {
   .game-topbar {
     padding: 10px 14px;
+    gap: 10px;
   }
   .player-name-text {
     display: none;
+  }
+  .game-stats-cluster {
+    gap: 8px;
   }
   .magic-power-badge {
     font-size: 0.8rem;
@@ -175,25 +179,44 @@
   }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 580px) {
   .game-topbar {
+    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 8px;
     padding: 8px 10px;
   }
+  .game-stats-cluster {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 2px;
+  }
   .topbar-logo-img {
-    height: 28px;
+    height: 26px;
   }
   .stat-badge {
     padding: 4px 10px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
   .magic-power-badge {
-    padding: 4px 10px 6px;
+    padding: 4px 12px 6px;
     font-size: 0.75rem;
   }
   .settings-gear-btn {
     width: 36px;
     height: 36px;
+  }
+}
+
+@media (max-width: 360px) {
+  .game-stats-cluster {
+    gap: 4px;
+  }
+  .stat-badge {
+    padding: 3px 6px;
+    font-size: 0.72rem;
   }
 }
 

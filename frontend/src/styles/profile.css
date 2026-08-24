@@ -104,3 +104,31 @@
   font-weight: 800;
 }
 
+@media (max-width: 600px) {
+  .profile-body {
+    padding: 0 12px;
+    margin: 20px auto;
+  }
+  .profile-card {
+    padding: 24px 16px;
+  }
+  .profile-username {
+    font-size: 1.6rem;
+  }
+  .profile-sub {
+    font-size: 0.9rem;
+  }
+  .profile-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .profile-stat-box {
+    padding: 12px 8px;
+  }
+  .profile-stat-value {
+    font-size: 1.3rem;
+  }
+}
+
+

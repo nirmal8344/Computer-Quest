@@ -216,8 +216,36 @@
 }
 
 @media (max-width: 600px) {
+  .leaderboard-screen {
+    padding: 20px 10px 60px;
+  }
+  .leaderboard-body {
+    margin-top: 36px;
+  }
+  .leaderboard-card {
+    padding: 20px 14px;
+  }
+  .leaderboard-header h2 {
+    font-size: 1.45rem;
+  }
   .leaderboard-row {
-    grid-template-columns: 44px 1fr auto;
+    grid-template-columns: 40px 1fr auto;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .rank-badge-box {
+    width: 36px;
+    height: 36px;
+  }
+  .rank-text {
+    font-size: 0.88rem;
+  }
+  .lb-name {
+    font-size: 0.98rem;
+  }
+  .lb-xp-pill {
+    padding: 4px 10px;
+    font-size: 0.82rem;
   }
   .lb-meta {
     display: none;
@@ -227,5 +255,16 @@
     left: 14px;
     padding: 6px 12px;
     font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .leaderboard-card {
+    padding: 14px 10px;
+  }
+  .leaderboard-row {
+    grid-template-columns: 32px 1fr auto;
+    gap: 6px;
+    padding: 8px 8px;
   }
 }

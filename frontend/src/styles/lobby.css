@@ -399,6 +399,10 @@ html, body {
 
 /* ===== Responsive: Tablet / Laptop ===== */
 @media (max-width: 900px) {
+  .lobby-stage {
+    padding: 80px 16px 40px;
+  }
+
   .lobby-center-content {
     gap: 16px;
     max-width: 640px;
@@ -429,33 +433,36 @@ html, body {
 }
 
 /* ===== Responsive: Mobile ===== */
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .lobby-stage {
-    padding: 70px 12px 40px;
+    padding: 16px 12px 40px;
+    justify-content: flex-start;
   }
 
   .lobby-profile-card {
-    top: 10px;
-    left: 10px;
-    min-width: 200px;
-    max-width: 240px;
-    padding: 6px 12px;
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: calc(100% - 100px);
+    margin-bottom: 12px;
+    padding: 8px 12px;
   }
 
   .lobby-top-right {
-    top: 10px;
-    right: 10px;
+    top: 16px;
+    right: 12px;
     gap: 8px;
   }
 
   .top-icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
 
   .avatar-wrapper {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   .profile-username {
@@ -465,14 +472,15 @@ html, body {
   .lobby-center-content {
     gap: 14px;
     max-width: 100%;
+    margin-top: 8px;
   }
 
   .lobby-logo-wrapper {
-    transform: scale(0.85);
+    transform: scale(0.88);
   }
 
   .btn-start-adventure {
-    height: 56px;
+    height: 60px;
     max-width: 100%;
     border-radius: 20px;
   }
@@ -487,13 +495,48 @@ html, body {
   }
 
   .secondary-btn {
-    height: 84px;
-    border-radius: 16px;
+    height: 90px;
+    border-radius: 18px;
     gap: 4px;
   }
 
+  .sec-btn-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+
   .sec-btn-label {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     letter-spacing: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .lobby-profile-card {
+    max-width: 100%;
+    margin-top: 48px;
+  }
+
+  .lobby-secondary-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .secondary-btn {
+    height: 60px;
+    border-radius: 16px;
+    flex-direction: row;
+    padding: 0 18px;
+    justify-content: flex-start;
+    gap: 14px;
+  }
+
+  .sec-btn-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .sec-btn-label {
+    font-size: 0.95rem;
   }
 }

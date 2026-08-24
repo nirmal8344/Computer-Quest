@@ -366,17 +366,65 @@
   flex: 1;
 }
 
-@media (max-width: 480px) {
-  .auth-game-screen {
-    padding: 12px;
+@media (max-width: 600px) {
+  .auth-landscape-frame {
+    max-width: 100%;
+    gap: 8px;
   }
   .auth-card-game {
-    padding: 20px 16px;
+    padding: clamp(16px, 4vw, 22px) clamp(12px, 3vw, 18px);
+    border-radius: var(--radius-lg);
+  }
+  .login-logo-artwork {
+    max-width: min(280px, 80vw);
+  }
+  .game-input {
+    font-size: 0.98rem;
+    padding: 11px 16px;
+  }
+  .field-label-game {
+    font-size: 0.82rem;
+  }
+  .step-heading-game {
+    font-size: 1.2rem;
+  }
+  .forgot-help-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-game-screen {
+    padding: 10px 8px;
   }
   .game-select-row {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .school-toggle-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .school-toggle-btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+  .wizard-btn-row {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .wizard-btn-row .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-card-game {
+    padding: 12px 10px;
   }
   .login-logo-artwork {
-    max-width: 260px;
+    max-width: 220px;
   }
 }
