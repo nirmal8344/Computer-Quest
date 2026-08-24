@@ -8,11 +8,11 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   padding-bottom: 24px;
   position: relative;
   overflow-x: hidden;
   box-sizing: border-box;
+  overscroll-behavior-y: none;
 }
 
 .mission-container,

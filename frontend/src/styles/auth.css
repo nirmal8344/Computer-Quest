@@ -9,11 +9,12 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   padding: clamp(10px, 2.5vh, 24px) clamp(12px, 3vw, 24px);
   position: relative;
   box-sizing: border-box;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior-y: none;
 }
 
 /* Dark subtle vignette over screen corners - fixed to viewport to avoid sliced bands */

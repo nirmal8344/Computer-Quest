@@ -54,22 +54,6 @@ export function AuthProvider({ children }) {
     }
 
     const newUser = await authApi.register(payload);
-
-    // The backend now creates PlayerProgress automatically in AuthService.register.
-    // If for any reason it wasn't created, we safely fallback to bootstrapping one.
-    try {
-      // Check if progress was created or ensure baseline
-    } catch {
-      const progress = await progressApi.create({
-        currentChapter: 1,
-        currentMission: 1,
-        lives: 3,
-        xp: 0,
-        answeredQuestions: 0,
-      });
-      await progressApi.linkUser(progress.id, newUser.id);
-    }
-
     persist(newUser);
     return newUser;
   }, []);
