@@ -26,9 +26,9 @@ public class QuestionController {
 
     @GetMapping
     public List<Question> getQuestions(
-            @RequestParam String unit,
-            @RequestParam String chapter,
-            @RequestParam Integer mission,
+            @RequestParam(required = false) String unit,
+            @RequestParam(required = false) String chapter,
+            @RequestParam(required = false) Integer mission,
             @RequestParam(required = false) String board,
             @RequestParam(required = false) Integer classLevel,
             @RequestParam(required = false) Long userId,

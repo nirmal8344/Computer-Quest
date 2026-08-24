@@ -1,6 +1,17 @@
 // Thin fetch wrapper mapped 1:1 to the existing Spring Boot endpoints.
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (envUrl && envUrl.trim() !== "") {
+    return envUrl.trim().replace(/\/+$/, "");
+  }
+  if (import.meta.env.PROD) {
+    return "";
+  }
+  return "http://localhost:8080";
+};
+
+const BASE_URL = getBaseUrl();
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {

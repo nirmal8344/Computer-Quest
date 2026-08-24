@@ -1,36 +1,52 @@
 // Drop this file into:
 // src/main/java/com/computerquest/computer_quest_backend/config/CorsConfig.java
-// (create the "config" package if it doesn't exist yet)
 //
-// This is additive only — it does not touch any existing controller, service,
-// or entity. It simply enables CORS globally so every endpoint (including the
-// ones missing @CrossOrigin today, like AuthController, ChapterController,
-// GameController, MissionController, PlayerProgressController and
-// QuestionController) can be called from the React dev server.
-//
-// Adjust allowedOrigins if your frontend runs on a different host/port than
-// http://localhost:5173 (Vite's default).
+// This enables CORS globally for /api/** endpoints with support for
+// local development origins and production origins via the ALLOWED_ORIGINS environment variable.
 
 package com.computerquest.computer_quest_backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 public class CorsConfig {
+
+    @Value("${allowed.origins:http://localhost:5173,http://localhost:4173,http://localhost:3000}")
+    private String allowedOrigins;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                List<String> originsList = new ArrayList<>();
+                originsList.add("http://localhost:*");
+                originsList.add("http://127.0.0.1:*");
+
+                if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+                    String[] origins = allowedOrigins.split(",");
+                    for (String origin : origins) {
+                        String trimmed = origin.trim();
+                        if (!trimmed.isEmpty() && !originsList.contains(trimmed)) {
+                            originsList.add(trimmed);
+                        }
+                    }
+                }
+
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:5173")
+                        .allowedOriginPatterns(originsList.toArray(new String[0]))
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
 }
+
