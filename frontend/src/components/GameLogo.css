@@ -109,12 +109,33 @@
 /* Size Scalers */
 .cq-logo-wrapper.large {
   transform: scale(1.15);
+  transform-origin: center center;
 }
 
 .cq-logo-wrapper.medium {
   transform: scale(1);
+  transform-origin: center center;
 }
 
 .cq-logo-wrapper.small {
   transform: scale(0.8);
+  transform-origin: center center;
+}
+
+@media (max-width: 600px) {
+  .cq-logo-wrapper.large {
+    transform: scale(0.88);
+  }
+}
+
+@media (max-height: 700px) {
+  .cq-logo-wrapper.large {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 380px) {
+  .cq-logo-wrapper.large {
+    transform: scale(0.72);
+  }
 }

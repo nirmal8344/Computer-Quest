@@ -1,20 +1,22 @@
 .map-game-screen {
   width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   position: relative;
   user-select: none;
 }
 
 .map-game-screen::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%);
   pointer-events: none;

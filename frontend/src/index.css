@@ -48,6 +48,7 @@ body {
     radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15), transparent 70%),
     radial-gradient(circle at 10% 90%, rgba(168, 85, 247, 0.12), transparent 60%),
     linear-gradient(180deg, #0b1526 0%, #060c18 100%);
+  background-attachment: fixed;
   color: #f1f5f9;
   overflow-x: hidden;
 }

@@ -1,5 +1,6 @@
 .mission-game-screen {
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100vw;
   max-width: 100%;
   display: flex;
@@ -7,6 +8,7 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   padding-bottom: 24px;
   position: relative;
   overflow-x: hidden;
