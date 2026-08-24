@@ -1,0 +1,106 @@
+.profile-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding-bottom: 60px;
+  position: relative;
+}
+
+.profile-body {
+  max-width: 640px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 0 24px;
+  z-index: 2;
+}
+
+.profile-card {
+  padding: 44px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+  border: 4px solid #fde047;
+  color: #451a03;
+  font-family: var(--font-game);
+  font-weight: 900;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 16px;
+}
+
+.profile-username {
+  color: #451a03;
+  font-size: 2.2rem;
+  font-family: var(--font-game);
+  margin: 0;
+}
+
+.profile-sub {
+  color: #78350f;
+  font-family: var(--font-game);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.profile-school-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.profile-stat-box {
+  background: rgba(245, 158, 11, 0.15);
+  border: 2px solid #d97706;
+  border-radius: var(--radius-md);
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.profile-stat-value {
+  font-family: var(--font-game);
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: #451a03;
+}
+
+.profile-stat-label {
+  font-family: var(--font-game);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #78350f;
+  font-weight: 800;
+}
+
