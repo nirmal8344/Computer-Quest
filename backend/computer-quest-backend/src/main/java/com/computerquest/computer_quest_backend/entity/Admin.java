@@ -3,13 +3,17 @@ package com.computerquest.computer_quest_backend.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "admins")
+@Table(name = "admins", indexes = {
+    @Index(name = "idx_admins_username", columnList = "username"),
+    @Index(name = "idx_admins_school_id", columnList = "school_id")
+})
 public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String username;
 
     private String password;

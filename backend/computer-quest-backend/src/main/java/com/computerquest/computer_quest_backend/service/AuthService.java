@@ -73,18 +73,18 @@ public class AuthService {
     }
 
     public User login(String username, String password) {
-
         User user = userRepository.findByUsername(username);
 
-        if (user != null && user.getPassword().equals(password)) {
-            // Populate transient fields so the JSON response includes school info
-            if (user.getSchool() != null) {
-                user.setSchoolId(user.getSchool().getId());
-                user.setSchoolName(user.getSchool().getName());
-            }
-            return user;
+        if (user == null || !user.getPassword().equals(password)) {
+            throw new RuntimeException("Invalid username or password");
         }
 
-        return null;
+        // Populate transient fields so the JSON response includes school info
+        if (user.getSchool() != null) {
+            user.setSchoolId(user.getSchool().getId());
+            user.setSchoolName(user.getSchool().getName());
+        }
+
+        return user;
     }
 }

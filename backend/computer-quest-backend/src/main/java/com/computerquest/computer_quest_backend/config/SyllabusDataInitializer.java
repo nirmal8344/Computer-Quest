@@ -40,29 +40,33 @@ public class SyllabusDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Clean up duplicate admin records in DB
-        List<com.computerquest.computer_quest_backend.entity.Admin> allAdmins = adminRepository.findAll();
-        java.util.Set<String> seenUsernames = new java.util.HashSet<>();
-        java.util.List<com.computerquest.computer_quest_backend.entity.Admin> duplicatesToDelete = new java.util.ArrayList<>();
-        for (com.computerquest.computer_quest_backend.entity.Admin a : allAdmins) {
-            if (a.getUsername() != null) {
-                if (seenUsernames.contains(a.getUsername())) {
-                    duplicatesToDelete.add(a);
-                } else {
-                    seenUsernames.add(a.getUsername());
+        // Clean up duplicate admin records in DB only if admins exist
+        if (adminRepository.count() > 1) {
+            List<com.computerquest.computer_quest_backend.entity.Admin> allAdmins = adminRepository.findAll();
+            java.util.Set<String> seenUsernames = new java.util.HashSet<>();
+            java.util.List<com.computerquest.computer_quest_backend.entity.Admin> duplicatesToDelete = new java.util.ArrayList<>();
+            for (com.computerquest.computer_quest_backend.entity.Admin a : allAdmins) {
+                if (a.getUsername() != null) {
+                    if (seenUsernames.contains(a.getUsername())) {
+                        duplicatesToDelete.add(a);
+                    } else {
+                        seenUsernames.add(a.getUsername());
+                    }
                 }
             }
-        }
-        if (!duplicatesToDelete.isEmpty()) {
-            adminRepository.deleteAll(duplicatesToDelete);
+            if (!duplicatesToDelete.isEmpty()) {
+                adminRepository.deleteAll(duplicatesToDelete);
+            }
         }
 
-        // Clean up pre-seeded dummy questions so every mission starts with clean questions
-        List<Question> seeded = questionRepository.findAll().stream()
-                .filter(q -> q.getQuestionText() != null && q.getQuestionText().contains("What is the core concept here?"))
-                .toList();
-        if (!seeded.isEmpty()) {
-            questionRepository.deleteAll(seeded);
+        // Clean up pre-seeded dummy questions only if questions exist
+        if (questionRepository.count() > 0) {
+            List<Question> seeded = questionRepository.findAll().stream()
+                    .filter(q -> q.getQuestionText() != null && q.getQuestionText().contains("What is the core concept here?"))
+                    .toList();
+            if (!seeded.isEmpty()) {
+                questionRepository.deleteAll(seeded);
+            }
         }
 
         seedSyllabus("CBSE", 11, "CBSE Class 11 CS", new String[]{

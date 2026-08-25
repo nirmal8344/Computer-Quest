@@ -54,6 +54,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findBySchool_Id(Long schoolId);
 
+    long countBySchool_Id(Long schoolId);
+
     List<Question> findBySchoolIsNull();
 
     @Query(value = """

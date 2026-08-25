@@ -7,21 +7,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Value("${allowed.origins:*}")
-    private String allowedOrigins = "*";
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        String[] origins = (allowedOrigins != null && !allowedOrigins.trim().isEmpty())
-                ? allowedOrigins.split(",")
-                : new String[]{"*"};
-
-        registry.addMapping("/**")
-                .allowedOriginPatterns(origins)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .allowedHeaders("*")
-                .allowCredentials(false)
-                .maxAge(3600);
-    }
+    // WebMvcConfigurer extensions can be placed here.
+    // CORS configuration is centralized in CorsConfig.java.
 }

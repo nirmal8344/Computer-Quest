@@ -14,24 +14,38 @@ const getBaseUrl = () => {
 const BASE_URL = getBaseUrl();
 
 async function request(path, options = {}) {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
+  const timeoutMs = options.timeout || 15000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  const contentType = res.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-  const body = isJson ? await res.json().catch(() => null) : await res.text();
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      ...options,
+    });
+    clearTimeout(timeoutId);
 
-  if (!res.ok) {
-    const message =
-      (isJson && body && (body.message || body.error)) ||
-      (typeof body === "string" && body) ||
-      `Request failed (${res.status})`;
-    throw new Error(message);
+    const contentType = res.headers.get("content-type") || "";
+    const isJson = contentType.includes("application/json");
+    const body = isJson ? await res.json().catch(() => null) : await res.text();
+
+    if (!res.ok) {
+      const message =
+        (isJson && body && (body.message || body.error)) ||
+        (typeof body === "string" && body) ||
+        `Request failed (${res.status})`;
+      throw new Error(message);
+    }
+
+    return body;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      throw new Error("Server response timed out. Please try again.");
+    }
+    throw err;
   }
-
-  return body;
 }
 
 // ----- Auth (/api/auth) -----

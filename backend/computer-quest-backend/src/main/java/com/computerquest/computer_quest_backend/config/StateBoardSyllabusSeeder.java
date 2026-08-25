@@ -55,8 +55,8 @@ public class StateBoardSyllabusSeeder {
             schoolClassRepository.save(new SchoolClass("12th Standard", 12, "STATE_BOARD", demoSchool));
         }
 
-        List<Question> existingSchoolQuestions = questionRepository.findBySchool_Id(demoSchool.getId());
-        if (existingSchoolQuestions.size() >= 680) {
+        long count = questionRepository.countBySchool_Id(demoSchool.getId());
+        if (count >= 680) {
             return;
         }
 
