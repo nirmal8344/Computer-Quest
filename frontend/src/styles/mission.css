@@ -1,6 +1,7 @@
 .mission-game-screen {
   min-height: 100vh;
   min-height: 100dvh;
+  height: auto;
   width: 100vw;
   max-width: 100%;
   display: flex;
@@ -8,11 +9,13 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  padding-bottom: 24px;
+  padding-top: clamp(64px, 10vh, 80px);
+  padding-bottom: clamp(24px, 5vh, 48px);
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
-  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mission-container,
@@ -23,6 +26,7 @@
   padding: 0 16px;
   box-sizing: border-box;
   z-index: 2;
+  flex: 1;
 }
 
 .briefing-card {

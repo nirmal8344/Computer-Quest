@@ -10,6 +10,8 @@ import com.computerquest.computer_quest_backend.repository.MissionRepository;
 import com.computerquest.computer_quest_backend.repository.QuestionRepository;
 import com.computerquest.computer_quest_backend.repository.SchoolRepository;
 import com.computerquest.computer_quest_backend.repository.UnitRepository;
+import com.computerquest.computer_quest_backend.entity.SchoolClass;
+import com.computerquest.computer_quest_backend.repository.SchoolClassRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class StateBoardSyllabusSeeder {
     private final MissionRepository missionRepository;
     private final QuestionRepository questionRepository;
     private final com.computerquest.computer_quest_backend.repository.QuestionAttemptRepository questionAttemptRepository;
+    private final SchoolClassRepository schoolClassRepository;
 
     public StateBoardSyllabusSeeder(
             SchoolRepository schoolRepository,
@@ -30,21 +33,30 @@ public class StateBoardSyllabusSeeder {
             ChapterRepository chapterRepository,
             MissionRepository missionRepository,
             QuestionRepository questionRepository,
-            com.computerquest.computer_quest_backend.repository.QuestionAttemptRepository questionAttemptRepository) {
+            com.computerquest.computer_quest_backend.repository.QuestionAttemptRepository questionAttemptRepository,
+            SchoolClassRepository schoolClassRepository) {
         this.schoolRepository = schoolRepository;
         this.unitRepository = unitRepository;
         this.chapterRepository = chapterRepository;
         this.missionRepository = missionRepository;
         this.questionRepository = questionRepository;
         this.questionAttemptRepository = questionAttemptRepository;
+        this.schoolClassRepository = schoolClassRepository;
     }
 
     public void seedDemoSchoolSyllabus() {
         School demoSchool = schoolRepository.findByName("Computer Quest Demo School")
                 .orElseGet(() -> schoolRepository.save(new School("Computer Quest Demo School")));
 
-        List<Unit> existingSchoolUnits = unitRepository.findBySchool_Id(demoSchool.getId());
-        if (existingSchoolUnits.size() >= 10) {
+        // Ensure 11th Standard and 12th Standard exist for Demo School in STATE_BOARD
+        List<SchoolClass> demoClasses = schoolClassRepository.findBySchool_IdAndBoard(demoSchool.getId(), "STATE_BOARD");
+        if (demoClasses.isEmpty()) {
+            schoolClassRepository.save(new SchoolClass("11th Standard", 11, "STATE_BOARD", demoSchool));
+            schoolClassRepository.save(new SchoolClass("12th Standard", 12, "STATE_BOARD", demoSchool));
+        }
+
+        List<Question> existingSchoolQuestions = questionRepository.findBySchool_Id(demoSchool.getId());
+        if (existingSchoolQuestions.size() >= 680) {
             return;
         }
 

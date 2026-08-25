@@ -3,7 +3,9 @@
   max-width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow: hidden;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   background-size: cover;
@@ -11,7 +13,7 @@
   background-repeat: no-repeat;
   position: relative;
   user-select: none;
-  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .map-game-screen::before {

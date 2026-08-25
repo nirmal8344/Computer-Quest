@@ -2,9 +2,11 @@
 
 .admin-shell {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: #f8fafc;
   color: #1e293b;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -19,7 +21,7 @@
   flex-direction: column;
   padding: 24px 16px;
   flex-shrink: 0;
-  height: 100vh;
+  min-height: 100vh;
   box-sizing: border-box;
 }
 
