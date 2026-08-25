@@ -16,6 +16,7 @@ public class PlayerProgress {
     private Integer xp;
 
     private Integer answeredQuestions;
+    private Integer pendingXp;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -66,6 +67,14 @@ public class PlayerProgress {
 
     public void setAnsweredQuestions(Integer answeredQuestions) {
         this.answeredQuestions = answeredQuestions;
+    }
+
+    public Integer getPendingXp() {
+        return pendingXp;
+    }
+
+    public void setPendingXp(Integer pendingXp) {
+        this.pendingXp = pendingXp;
     }
 
     public User getUser() {

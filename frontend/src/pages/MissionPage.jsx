@@ -59,7 +59,7 @@ export default function MissionPage() {
       .catch((err) => setError(err.message));
   }, [meta, chapterId, missionNumber, user.id]);
 
-  useEffect(() => {
+  const loadQuestions = () => {
     if (!meta) return;
     questionApi
       .getForMission(meta.unit, meta.chapterName, meta.missionNumber, { userId: user.id })
@@ -68,6 +68,10 @@ export default function MissionPage() {
         setQuestions(cleaned);
       })
       .catch((err) => setError(err.message));
+  };
+
+  useEffect(() => {
+    loadQuestions();
   }, [meta, user.id]);
 
   const current = questions?.[index];
@@ -278,6 +282,7 @@ export default function MissionPage() {
                       setIndex(0);
                       setSelected(null);
                       setFeedback(null);
+                      loadQuestions();
                     }}
                   >
                     <span>Retry Mission</span>

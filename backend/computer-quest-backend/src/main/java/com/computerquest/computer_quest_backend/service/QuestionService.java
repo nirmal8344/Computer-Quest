@@ -9,14 +9,17 @@ import com.computerquest.computer_quest_backend.entity.Question;
 import com.computerquest.computer_quest_backend.entity.QuestionAttempt;
 import com.computerquest.computer_quest_backend.entity.School;
 import com.computerquest.computer_quest_backend.entity.User;
+import com.computerquest.computer_quest_backend.entity.UserQuestionReward;
 import com.computerquest.computer_quest_backend.repository.AdminRepository;
 import com.computerquest.computer_quest_backend.repository.ChapterRepository;
 import com.computerquest.computer_quest_backend.repository.PlayerProgressRepository;
 import com.computerquest.computer_quest_backend.repository.QuestionAttemptRepository;
 import com.computerquest.computer_quest_backend.repository.QuestionRepository;
 import com.computerquest.computer_quest_backend.repository.SchoolRepository;
+import com.computerquest.computer_quest_backend.repository.UserQuestionRewardRepository;
 import com.computerquest.computer_quest_backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class QuestionService {
     private final ChapterRepository chapterRepository;
     private final SchoolRepository schoolRepository;
     private final AdminRepository adminRepository;
+    private final UserQuestionRewardRepository userQuestionRewardRepository;
 
     public QuestionService(
             QuestionRepository questionRepository,
@@ -38,7 +42,8 @@ public class QuestionService {
             QuestionAttemptRepository questionAttemptRepository,
             ChapterRepository chapterRepository,
             SchoolRepository schoolRepository,
-            AdminRepository adminRepository) {
+            AdminRepository adminRepository,
+            UserQuestionRewardRepository userQuestionRewardRepository) {
 
         this.questionRepository = questionRepository;
         this.playerProgressRepository = playerProgressRepository;
@@ -47,6 +52,7 @@ public class QuestionService {
         this.chapterRepository = chapterRepository;
         this.schoolRepository = schoolRepository;
         this.adminRepository = adminRepository;
+        this.userQuestionRewardRepository = userQuestionRewardRepository;
     }
 
     // Save question
@@ -228,6 +234,7 @@ public class QuestionService {
     }
 
     // Check submitted answer
+    @Transactional
     public AnswerResponse checkAnswer(AnswerRequest request) {
 
         // 1. Find question
@@ -261,6 +268,10 @@ public class QuestionService {
             progress.setXp(0);
         }
 
+        if (progress.getPendingXp() == null) {
+            progress.setPendingXp(0);
+        }
+
         if (progress.getCurrentChapter() == null) {
             progress.setCurrentChapter(1);
         }
@@ -286,25 +297,21 @@ public class QuestionService {
                 progress.getAnsweredQuestions() + 1
         );
 
-        // 8. Correct / Wrong
+        // 8. Pending XP / Lives handling
         if (correct) {
-
-            // Correct answer → +10 XP
-            progress.setXp(
-                    progress.getXp() + 10
-            );
-
+            // Check if user has already permanently earned XP for this question (anti-farming)
+            boolean alreadyRewarded = userQuestionRewardRepository.existsByUserIdAndQuestionId(user.getId(), question.getId());
+            if (!alreadyRewarded) {
+                progress.setPendingXp(progress.getPendingXp() + 10);
+            }
         } else {
-
             // Wrong answer → -1 Life
-            progress.setLives(
-                    progress.getLives() - 1
-            );
+            progress.setLives(progress.getLives() - 1);
         }
 
-        // 9. Mission failed
+        // 9. Mission failed (lives reach 0 before 5 questions completed)
         if (progress.getLives() <= 0) {
-
+            progress.setPendingXp(0);
             progress.setLives(3);
             progress.setAnsweredQuestions(0);
 
@@ -317,18 +324,31 @@ public class QuestionService {
             );
         }
 
-        // 10. Five questions completed
+        // 10. Five questions completed before losing all 3 lives (Mission Success)
         if (progress.getAnsweredQuestions() >= 5) {
 
-            int completedMission =
-                    progress.getCurrentMission();
+            // Commit pending XP to permanent XP
+            progress.setXp(progress.getXp() + progress.getPendingXp());
+
+            // Anti-farming: record UserQuestionReward for correct questions in this attempt
+            List<QuestionAttempt> attempts = questionAttemptRepository.findByUser_Id(user.getId());
+            int startIdx = Math.max(0, attempts.size() - 5);
+            for (int i = startIdx; i < attempts.size(); i++) {
+                QuestionAttempt qa = attempts.get(i);
+                if (Boolean.TRUE.equals(qa.getCorrect()) && qa.getQuestion() != null) {
+                    Long qId = qa.getQuestion().getId();
+                    if (!userQuestionRewardRepository.existsByUserIdAndQuestionId(user.getId(), qId)) {
+                        userQuestionRewardRepository.save(new UserQuestionReward(user, qa.getQuestion()));
+                    }
+                }
+            }
+
+            int completedMission = progress.getCurrentMission();
 
             // 11. Mission 4 completed
             if (completedMission == 4) {
 
-                int currentChapter =
-                        progress.getCurrentChapter();
-
+                int currentChapter = progress.getCurrentChapter();
                 Long userSchoolId = user.getSchool() != null ? user.getSchool().getId() : null;
 
                 // Current chapter matching user school, board & class
@@ -371,32 +391,21 @@ public class QuestionService {
                 }
 
                 if (nextChapter != null) {
-
                     nextChapter.setUnlocked(true);
-
-                    chapterRepository.save(
-                            nextChapter
-                    );
+                    chapterRepository.save(nextChapter);
 
                     // Move player to next chapter
-                    progress.setCurrentChapter(
-                            currentChapter + 1
-                    );
-
+                    progress.setCurrentChapter(currentChapter + 1);
                     progress.setCurrentMission(1);
                 }
 
             } else {
-
-                // Mission 1 → 2
-                // Mission 2 → 3
-                // Mission 3 → 4
-                progress.setCurrentMission(
-                        completedMission + 1
-                );
+                // Mission 1 → 2 → 3 → 4
+                progress.setCurrentMission(completedMission + 1);
             }
 
             // Reset for next mission/chapter
+            progress.setPendingXp(0);
             progress.setAnsweredQuestions(0);
             progress.setLives(3);
 
