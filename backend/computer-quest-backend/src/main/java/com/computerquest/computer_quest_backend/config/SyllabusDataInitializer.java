@@ -130,7 +130,9 @@ public class SyllabusDataInitializer implements CommandLineRunner {
                 if (existingMissions.isEmpty()) {
                     Mission missionEntity = new Mission();
                     missionEntity.setMissionNumber(mNum);
-                    missionEntity.setGameType("Quiz");
+                    String gameType = (mNum == 1 || mNum == 3) ? "MCQ Quiz" :
+                                      (mNum == 2) ? "Fill in the Blank" : "Scenario Challenge";
+                    missionEntity.setGameType(gameType);
                     missionEntity.setChapter(chapterEntity);
                     missionRepository.save(missionEntity);
                 }

@@ -44,17 +44,27 @@ export default function MissionPage() {
 
   // Resolve unit/chapterName if page loaded directly
   useEffect(() => {
-    if (meta) return;
+    if (meta && meta.chapterId) return;
     chapterApi
       .getAll({ userId: user.id })
       .then((chapters) => {
         const ch = chapters.find((c) => String(c.id) === String(chapterId));
         if (!ch) throw new Error("Chapter not found.");
-        setMeta({
+        setMeta((prev) => ({
+          ...prev,
+          unitId: prev?.unitId || 1,
+          chapterId: ch.id,
           unit: ch.unit,
           chapterName: ch.chapterName,
           missionNumber: Number(missionNumber),
-        });
+          gameType:
+            prev?.gameType ||
+            (Number(missionNumber) === 1 || Number(missionNumber) === 3
+              ? "MCQ Quiz"
+              : Number(missionNumber) === 2
+              ? "Fill in the Blank"
+              : "Scenario Challenge"),
+        }));
       })
       .catch((err) => setError(err.message));
   }, [meta, chapterId, missionNumber, user.id]);
@@ -82,7 +92,7 @@ export default function MissionPage() {
   };
 
   const handleSubmit = async () => {
-    if (!selected || !current) return;
+    if ((selected === null || selected === "") || !current) return;
     setSubmitting(true);
     setError("");
     try {
@@ -110,7 +120,13 @@ export default function MissionPage() {
     setIndex((i) => i + 1);
   };
 
-  // Shared Floating Top Bar Component (No dark blue header)
+  const handleBackToMap = () => {
+    const uId = meta?.unitId || 1;
+    const cId = meta?.chapterId || chapterId || 1;
+    navigate(`/map?unitId=${uId}&chapterId=${cId}`);
+  };
+
+  // Shared Floating Top Bar Component
   const renderMapTopBar = () => (
     <div className="map-top-bar">
       <div className="lives-container">
@@ -120,8 +136,8 @@ export default function MissionPage() {
       </div>
 
       <div className="top-bar-right">
-        <button className="icon-btn-round home-btn" onClick={() => navigate("/map")} title="Back to Map">
-          <span className="btn-glyph">🏠</span>
+        <button className="icon-btn-round home-btn" onClick={handleBackToMap} title="Back to Missions">
+          <span className="btn-glyph">⬅️</span>
         </button>
 
         <button
@@ -150,9 +166,9 @@ export default function MissionPage() {
         {renderMapTopBar()}
         <div className="mission-container">
           <div className="error-banner mission-error">{error}</div>
-          <button className="btn btn-ghost" onClick={() => navigate("/map")}>
+          <button className="btn btn-ghost" onClick={handleBackToMap}>
             <MapIcon size={20} />
-            <span>Back to Map</span>
+            <span>Back to Missions</span>
           </button>
         </div>
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
@@ -179,13 +195,15 @@ export default function MissionPage() {
         <div className="mission-container">
           <div className="briefing-card panel-parchment">
             <div className="briefing-header">
-              <span className="briefing-tag">MISSION BRIEFING</span>
+              <span className="briefing-tag">
+                {(meta.gameType || "MISSION").toUpperCase()} — MISSION {meta.missionNumber}
+              </span>
               <h2>{meta.chapterName} — Mission {meta.missionNumber}</h2>
             </div>
 
             <TeacherGuide
               title="Teacher Adriane"
-              speech={`Explorer, welcome to Mission ${meta.missionNumber}! In this challenge, you will be presented with 5 computer science questions. Answer accurately to earn XP (+10 XP per correct answer) and protect your lives. Are you ready?`}
+              speech={`Explorer, welcome to Mission ${meta.missionNumber}! In this challenge, you must answer all 5 computer science questions correctly. Each correct answer earns +10 XP. Lose 3 lives and you must retry. Are you ready?`}
               mood="excited"
               actionText="Start Mission"
               onAction={() => setStage("PLAYING")}
@@ -202,7 +220,7 @@ export default function MissionPage() {
 
               <div className="teacher-speech-bubble">
                 <p className="speech-text">
-                  Explorer, welcome to Mission {meta.missionNumber}! In this challenge, you will be presented with 5 computer science questions. Answer accurately to earn XP (+10 XP per correct answer) and protect your lives. Are you ready?
+                  Explorer, welcome to Mission {meta.missionNumber}! Answer all 5 questions to earn 5 stars and unlock the next mission!
                 </p>
                 <button className="teacher-ok-btn" onClick={() => setShowTeacherPopup(false)}>
                   OK
@@ -234,13 +252,13 @@ export default function MissionPage() {
                   </div>
                   <h1 className="outcome-title-complete">CHAPTER COMPLETE!</h1>
                   <p className="outcome-sub">
-                    Incredible job! You completed all 4 missions in <strong>{meta.chapterName}</strong>. The next chapter has been unlocked on your quest map!
+                    Incredible job! You completed all 4 missions in <strong>{meta.chapterName}</strong> and earned 5 Stars! The next chapter has been unlocked!
                   </p>
                   <div className="outcome-stats-box">
-                    <span className="stat-item"><StarIcon size={20} /> Total XP Earned</span>
+                    <span className="stat-item"><StarIcon size={20} filled={true} /> 5 Stars Earned</span>
                     <span className="stat-item"><HeartIcon size={20} /> Remaining Lives: {lives ?? 3}</span>
                   </div>
-                  <button className="btn btn-emerald btn-lg btn-block" onClick={() => navigate("/map")}>
+                  <button className="btn btn-emerald btn-lg btn-block" onClick={handleBackToMap}>
                     <MapIcon size={22} />
                     <span>Return to Map & View Next Chapter</span>
                   </button>
@@ -252,13 +270,13 @@ export default function MissionPage() {
                   </div>
                   <h1 className="outcome-title-complete">MISSION COMPLETE!</h1>
                   <p className="outcome-sub">
-                    Great work! You completed Mission {meta.missionNumber}. Your progress has been saved.
+                    Great work! You completed 5/5 questions in Mission {meta.missionNumber} and earned 5 Stars! The next mission is unlocked!
                   </p>
                   <div className="outcome-stats-box">
-                    <span className="stat-item"><StarIcon size={20} /> XP Updated</span>
+                    <span className="stat-item"><StarIcon size={20} filled={true} /> 5 Stars Earned</span>
                     <span className="stat-item"><HeartIcon size={20} /> Remaining Lives: {lives ?? 3}</span>
                   </div>
-                  <button className="btn btn-emerald btn-lg btn-block" onClick={() => navigate("/map")}>
+                  <button className="btn btn-emerald btn-lg btn-block" onClick={handleBackToMap}>
                     <MapIcon size={22} />
                     <span>Continue to Next Mission</span>
                   </button>
@@ -271,7 +289,7 @@ export default function MissionPage() {
                 </div>
                 <h1 className="outcome-title-failed">MISSION FAILED</h1>
                 <p className="outcome-sub">
-                  You ran out of lives! Don't worry, your lives have been restored to 3. Review the concepts and try again.
+                  You ran out of lives before completing all 5 questions! No stars were awarded. Your lives have been restored to 3. Try again!
                 </p>
                 <div className="outcome-actions">
                   <button
@@ -287,9 +305,9 @@ export default function MissionPage() {
                   >
                     <span>Retry Mission</span>
                   </button>
-                  <button className="btn btn-ghost btn-block" onClick={() => navigate("/map")}>
+                  <button className="btn btn-ghost btn-block" onClick={handleBackToMap}>
                     <MapIcon size={20} />
-                    <span>Return to Map</span>
+                    <span>Return to Missions</span>
                   </button>
                 </div>
               </>
@@ -310,9 +328,9 @@ export default function MissionPage() {
           <div className="outcome-card panel-parchment">
             <h2>No Questions Available</h2>
             <p>This mission doesn't have any questions yet.</p>
-            <button className="btn btn-emerald" onClick={() => navigate("/map")}>
+            <button className="btn btn-emerald" onClick={handleBackToMap}>
               <MapIcon size={20} />
-              <span>Back to Map</span>
+              <span>Back to Missions</span>
             </button>
           </div>
         </div>
@@ -326,25 +344,29 @@ export default function MissionPage() {
     text: current[`option${key}`],
   })).filter((o) => o.text);
 
+  // Check Game Type for Question Display
+  const isFillInBlank = Number(meta.missionNumber) === 2 || current.questionType === "FILL_BLANK";
+  const isScenario = Number(meta.missionNumber) === 4 || current.questionType === "SCENARIO" || current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE";
+
   return (
     <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
       {renderMapTopBar()}
 
       <div className="game-scene-container playing-mode">
-        {/* Question Card & 4 Answer Options matching Reference Image */}
+        {/* Question Card & Game-Specific Answer Format */}
         <div className="question-game-card panel-parchment">
           <div className="question-bubble">
-            <span className="q-number-chip">Q{index + 1}</span>
+            <span className="q-number-chip">Q{index + 1}/5</span>
             <div className="question-meta-text">
               <span className="question-subject-title">
-                [{meta.board || "CBSE"} Class {meta.classLevel || 11}] {meta.chapterName} (Mission {meta.missionNumber} Q{index + 1}):
+                [{meta.board || "CBSE"} Class {meta.classLevel || 11}] {meta.chapterName} (Mission {meta.missionNumber} — {meta.gameType || (isFillInBlank ? "Fill in the Blank" : isScenario ? "Scenario Challenge" : "MCQ Quiz")}):
               </span>
               <h2 className="question-text">{current.questionText}</h2>
             </div>
           </div>
 
-          {/* Question Render Logic based on questionType */}
-          {current.questionType === "FILL_BLANK" ? (
+          {/* Render ONLY the assigned game type */}
+          {isFillInBlank ? (
             <div className="blank-input-box" style={{ padding: "16px 0" }}>
               <input
                 type="text"
@@ -363,7 +385,7 @@ export default function MissionPage() {
                 }}
               />
             </div>
-          ) : current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE" ? (
+          ) : isScenario && (current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE" || current.codeLanguage) && options.length === 0 ? (
             <div className="code-editor-box" style={{ padding: "12px 0" }}>
               <div className="code-editor-header" style={{
                 display: "flex",
@@ -388,7 +410,7 @@ export default function MissionPage() {
                 }}>
                   {current.codeLanguage || "CODE"}
                 </span>
-                <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>Code Editor</span>
+                <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>Scenario Code Editor</span>
               </div>
               <textarea
                 className="code-editor-input"
@@ -398,7 +420,7 @@ export default function MissionPage() {
                   current.codeLanguage === "Python" ? "# Write your Python code here..." :
                   current.codeLanguage === "C" ? "// Write your C code here..." :
                   current.codeLanguage === "Java" ? "// Write your Java code here..." :
-                  "Write your code here..."
+                  "Write your answer here..."
                 }
                 value={selected !== null ? selected : (current.optionA || "")}
                 onChange={(e) => !feedback && setSelected(e.target.value)}
@@ -417,6 +439,7 @@ export default function MissionPage() {
               />
             </div>
           ) : (
+            /* MCQ / Scenario Choice Buttons */
             <div className="options-game-grid">
               {options.map((opt) => {
                 const isSelected = selected === opt.key;
@@ -446,11 +469,7 @@ export default function MissionPage() {
               disabled={(selected === null || selected === "") || submitting}
               onClick={handleSubmit}
             >
-              {submitting
-                ? "SUBMITTING..."
-                : current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE"
-                ? `RUN / SUBMIT ${(current.codeLanguage || "CODE").toUpperCase()}`
-                : "SUBMIT ANSWER"}
+              {submitting ? "SUBMITTING..." : "SUBMIT ANSWER"}
             </button>
           ) : (
             <div className={`feedback-card-banner ${feedback.correct ? "good" : "bad"}`}>
@@ -486,7 +505,7 @@ export default function MissionPage() {
 
             <div className="teacher-speech-bubble">
               <p className="speech-text">
-                Explorer, welcome to Mission {meta.missionNumber}! Select the correct answer for each question to earn XP (+10 XP per correct answer) and protect your lives. Good luck!
+                Explorer, welcome to Mission {meta.missionNumber}! Complete all 5 questions to earn 5 stars and protect your lives. Good luck!
               </p>
               <button className="teacher-ok-btn" onClick={() => setShowTeacherPopup(false)}>
                 OK

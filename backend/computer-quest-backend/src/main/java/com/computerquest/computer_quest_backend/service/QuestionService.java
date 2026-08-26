@@ -140,6 +140,13 @@ public class QuestionService {
                 if (user.getSchool() != null) {
                     schoolId = user.getSchool().getId();
                 }
+                PlayerProgress progress = playerProgressRepository.findByUserId(userId).orElse(null);
+                if (progress != null) {
+                    progress.setAnsweredQuestions(0);
+                    progress.setPendingXp(0);
+                    progress.setLives(3);
+                    playerProgressRepository.save(progress);
+                }
             }
         }
 

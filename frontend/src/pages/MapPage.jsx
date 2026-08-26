@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { unitApi, chapterApi, missionApi, gameApi } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import SettingsModal from "../components/SettingsModal.jsx";
@@ -9,11 +9,6 @@ import {
   LockIcon,
   StarIcon,
   GearIcon,
-  McqTypeIcon,
-  FillBlankTypeIcon,
-  TrueFalseTypeIcon,
-  MatchingTypeIcon,
-  ShortAnswerTypeIcon,
   BackArrowIcon,
   ForwardArrowIcon,
 } from "../components/GameIcons.jsx";
@@ -22,19 +17,17 @@ import teacherImg from "../assets/images/teacher_adriane.jpg";
 import "../styles/map.css";
 
 // Map Flow Stages:
-// 1. 'UNITS'          -> Units Map (Start Adventure)
-// 2. 'CHAPTERS'       -> Chapters Map (Unit Selected)
-// 3. 'MISSIONS'       -> Missions Map (Chapter Selected)
-// 4. 'QUESTION_TYPES' -> Question Types Map (Mission Selected)
+// 1. 'UNITS'    -> Units Map (Start Adventure)
+// 2. 'CHAPTERS' -> Chapters Map (Unit Selected via URL param ?unitId=X)
+// 3. 'MISSIONS' -> Missions Map (Chapter Selected via URL param ?unitId=X&chapterId=Y)
 
 export default function MapPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [mapStage, setMapStage] = useState("UNITS");
-  const [selectedUnit, setSelectedUnit] = useState(null);
-  const [selectedChapter, setSelectedChapter] = useState(null);
-  const [selectedMission, setSelectedMission] = useState(null);
+  const unitIdParam = searchParams.get("unitId");
+  const chapterIdParam = searchParams.get("chapterId");
 
   const [unitsData, setUnitsData] = useState([]);
   const [chaptersData, setChaptersData] = useState([]);
@@ -87,6 +80,28 @@ export default function MapPage() {
     };
   }, [user.id]);
 
+  // Derived selected Unit & Chapter based on URL search parameters
+  const selectedUnit = useMemo(() => {
+    if (!unitIdParam) return null;
+    return (
+      unitsData.find(
+        (u) => String(u.id) === String(unitIdParam) || String(u.unitNumber) === String(unitIdParam)
+      ) || null
+    );
+  }, [unitIdParam, unitsData]);
+
+  const selectedChapter = useMemo(() => {
+    if (!chapterIdParam) return null;
+    return chaptersData.find((ch) => String(ch.id) === String(chapterIdParam)) || null;
+  }, [chapterIdParam, chaptersData]);
+
+  // Map Stage derived strictly from selection
+  const mapStage = useMemo(() => {
+    if (selectedChapter) return "MISSIONS";
+    if (selectedUnit) return "CHAPTERS";
+    return "UNITS";
+  }, [selectedChapter, selectedUnit]);
+
   // Current stage items calculation
   const currentStageItems = useMemo(() => {
     if (mapStage === "UNITS") {
@@ -103,15 +118,6 @@ export default function MapPage() {
       if (!selectedChapter) return missionsData;
       return missionsData.filter((m) => m.chapter?.id === selectedChapter.id);
     }
-    if (mapStage === "QUESTION_TYPES") {
-      return [
-        { type: "MCQ", title: "MCQ", icon: <McqTypeIcon size={34} /> },
-        { type: "FILL_IN_BLANK", title: "FILL IN THE BLANK", icon: <FillBlankTypeIcon size={34} /> },
-        { type: "TRUE_FALSE", title: "TRUE / FALSE", icon: <TrueFalseTypeIcon size={34} /> },
-        { type: "MATCHING", title: "MATCHING", icon: <MatchingTypeIcon size={34} /> },
-        { type: "SHORT_ANSWER", title: "SHORT ANSWER", icon: <ShortAnswerTypeIcon size={34} /> },
-      ];
-    }
     return [];
   }, [mapStage, selectedUnit, selectedChapter, unitsData, chaptersData, missionsData]);
 
@@ -123,16 +129,13 @@ export default function MapPage() {
     (pageIndex + 1) * ITEMS_PER_PAGE
   );
 
-  // Back Navigation Action
+  // Back Navigation Action: returns 1 level up in the hierarchy
   const handleNavBack = () => {
-    if (mapStage === "QUESTION_TYPES") {
-      setMapStage("MISSIONS");
-      setPageIndex(0);
-    } else if (mapStage === "MISSIONS") {
-      setMapStage("CHAPTERS");
+    if (mapStage === "MISSIONS") {
+      setSearchParams({ unitId: selectedUnit?.id || selectedUnit?.unitNumber || 1 });
       setPageIndex(0);
     } else if (mapStage === "CHAPTERS") {
-      setMapStage("UNITS");
+      setSearchParams({});
       setPageIndex(0);
     } else {
       navigate("/lobby");
@@ -141,30 +144,35 @@ export default function MapPage() {
 
   // Node Click Handlers
   const handleUnitClick = (unit) => {
-    setSelectedUnit(unit);
-    setMapStage("CHAPTERS");
+    setSearchParams({ unitId: unit.id || unit.unitNumber });
     setPageIndex(0);
   };
 
   const handleChapterClick = (chapter) => {
-    setSelectedChapter(chapter);
-    setMapStage("MISSIONS");
+    setSearchParams({
+      unitId: selectedUnit?.id || selectedUnit?.unitNumber || 1,
+      chapterId: chapter.id,
+    });
     setPageIndex(0);
   };
 
   const handleMissionClick = (mission) => {
-    setSelectedMission(mission);
-    setMapStage("QUESTION_TYPES");
-    setPageIndex(0);
-  };
+    const gameType =
+      mission.gameType ||
+      (mission.missionNumber === 1 || mission.missionNumber === 3
+        ? "MCQ Quiz"
+        : mission.missionNumber === 2
+        ? "Fill in the Blank"
+        : "Scenario Challenge");
 
-  const handleQuestionTypeClick = (qType) => {
-    navigate(`/mission/${selectedChapter?.id || 1}/${selectedMission?.missionNumber || 1}`, {
+    navigate(`/mission/${selectedChapter?.id || 1}/${mission.missionNumber || 1}`, {
       state: {
+        unitId: selectedUnit?.id || selectedUnit?.unitNumber || 1,
+        chapterId: selectedChapter?.id || 1,
         unit: selectedChapter?.unit || selectedUnit?.unitName || "Unit 1",
         chapterName: selectedChapter?.chapterName || "Chapter 1",
-        missionNumber: selectedMission?.missionNumber || 1,
-        gameType: qType.type,
+        missionNumber: mission.missionNumber || 1,
+        gameType: gameType,
       },
     });
   };
@@ -179,12 +187,6 @@ export default function MapPage() {
       const uName = selectedUnit?.unitName || `Unit ${selectedUnit?.unitNumber || 1}`;
       return `${uName} > Chapter ${selectedChapter?.chapterNumber || 1}`;
     }
-    if (mapStage === "QUESTION_TYPES") {
-      const uName = selectedUnit?.unitName || `Unit ${selectedUnit?.unitNumber || 1}`;
-      return `${uName} > Chapter ${selectedChapter?.chapterNumber || 1} > Mission ${
-        selectedMission?.missionNumber || 1
-      }`;
-    }
     return "Map";
   };
 
@@ -196,10 +198,7 @@ export default function MapPage() {
     if (mapStage === "CHAPTERS") {
       return { title: "Explore Chapters", subtitle: "Complete chapters to unlock the next" };
     }
-    if (mapStage === "MISSIONS") {
-      return { title: "Explore Missions", subtitle: "Complete missions to unlock the next" };
-    }
-    return { title: "Question Types", subtitle: "Complete all to master this mission" };
+    return { title: "Explore Missions", subtitle: "Complete 5 questions to earn 5 stars & unlock next mission" };
   };
 
   // Teacher Speech Text
@@ -210,10 +209,7 @@ export default function MapPage() {
     if (mapStage === "CHAPTERS") {
       return `Explore Chapters! Select a chapter to discover its missions.`;
     }
-    if (mapStage === "MISSIONS") {
-      return `Explore Missions! Select a mission to view available question types.`;
-    }
-    return `Master Question Types! Complete all question types to earn maximum stars!`;
+    return `Explore Missions! Complete all 5 questions in a mission to earn 5 stars and unlock the next mission!`;
   };
 
   const banner = getBannerConfig();
@@ -229,8 +225,8 @@ export default function MapPage() {
         </div>
 
         <div className="top-bar-right">
-          <button className="icon-btn-round home-btn" onClick={handleNavBack} title="Back / Home">
-            <span className="btn-glyph">🏠</span>
+          <button className="icon-btn-round home-btn" onClick={handleNavBack} title="Back">
+            <span className="btn-glyph">⬅️</span>
           </button>
 
           <button
@@ -325,23 +321,19 @@ export default function MapPage() {
                         (selectedChapter?.chapterNumber === (gameData?.currentChapter ?? 1) &&
                           nodeNumber < (gameData?.currentMission ?? 1));
                       onClickHandler = () => isUnlocked && handleMissionClick(item);
-                    } else if (mapStage === "QUESTION_TYPES") {
-                      nodeLabel = item.title;
-                      isUnlocked = true;
-                      onClickHandler = () => handleQuestionTypeClick(item);
                     }
 
                     return (
                       <div
-                        key={item.id || item.type || idx}
+                        key={item.id || idx}
                         className={`map-node-anchor node-slot-${idx + 1}`}
                       >
-                        {/* Stars on top of unlocked nodes */}
-                        {isUnlocked && (
+                        {/* 5 Golden Stars on top of COMPLETED missions ONLY */}
+                        {mapStage === "MISSIONS" && isCompleted && (
                           <div className="node-stars-row">
-                            <StarIcon size={16} />
-                            <StarIcon size={16} />
-                            <StarIcon size={16} />
+                            {[1, 2, 3, 4, 5].map((num) => (
+                              <StarIcon key={num} size={14} filled={true} />
+                            ))}
                           </div>
                         )}
 
@@ -353,15 +345,11 @@ export default function MapPage() {
                           onClick={onClickHandler}
                           disabled={!isUnlocked}
                         >
-                          {mapStage === "QUESTION_TYPES" ? (
-                            <div className="qtype-icon-box">{item.icon}</div>
-                          ) : (
-                            <span className="node-text">
-                              {mapStage === "CHAPTERS"
-                                ? `${selectedUnit?.unitNumber || 1}.${item.chapterNumber || idx + 1}`
-                                : nodeNumber}
-                            </span>
-                          )}
+                          <span className="node-text">
+                            {mapStage === "CHAPTERS"
+                              ? `${selectedUnit?.unitNumber || 1}.${item.chapterNumber || idx + 1}`
+                              : nodeNumber}
+                          </span>
 
                           {!isUnlocked && (
                             <div className="node-lock-badge">
@@ -422,4 +410,3 @@ export default function MapPage() {
     </div>
   );
 }
-
