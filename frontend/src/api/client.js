@@ -51,11 +51,12 @@ async function request(path, options = {}) {
 // ----- Auth (/api/auth) -----
 export const authApi = {
   register: (user) =>
-    request("/api/auth/register", { method: "POST", body: JSON.stringify(user) }),
+    request("/api/auth/register", { method: "POST", body: JSON.stringify(user), timeout: 90000 }),
   login: (username, password) =>
     request("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ username, password }),
+      timeout: 90000,
     }),
 };
 
@@ -174,11 +175,12 @@ export const classApi = {
 // ----- Admin Combined Object -----
 export const adminApi = {
   createAdmin: (admin) =>
-    request("/api/admin", { method: "POST", body: JSON.stringify(admin) }),
+    request("/api/admin", { method: "POST", body: JSON.stringify(admin), timeout: 90000 }),
   login: (username, password) =>
     request("/api/admin/login", {
       method: "POST",
       body: JSON.stringify({ username, password }),
+      timeout: 90000,
     }),
   getClasses: classApi.getClasses,
   createClass: classApi.createClass,

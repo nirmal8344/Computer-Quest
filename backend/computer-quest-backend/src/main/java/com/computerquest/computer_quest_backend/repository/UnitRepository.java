@@ -13,6 +13,8 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
 
     List<Unit> findBySchoolIsNullAndBoardAndClassLevel(String board, Integer classLevel);
 
+    boolean existsBySchoolIsNullAndBoardAndClassLevel(String board, Integer classLevel);
+
     List<Unit> findBySchool_Id(Long schoolId);
 
     List<Unit> findBySchoolIsNull();

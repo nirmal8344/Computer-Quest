@@ -40,7 +40,7 @@ public class SyllabusDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Clean up duplicate admin records in DB only if admins exist
+        // Clean up duplicate admin records in DB only if duplicate count > 1
         if (adminRepository.count() > 1) {
             List<com.computerquest.computer_quest_backend.entity.Admin> allAdmins = adminRepository.findAll();
             java.util.Set<String> seenUsernames = new java.util.HashSet<>();
@@ -59,29 +59,32 @@ public class SyllabusDataInitializer implements CommandLineRunner {
             }
         }
 
-        // Clean up pre-seeded dummy questions only if questions exist
-        if (questionRepository.count() > 0) {
-            List<Question> seeded = questionRepository.findAll().stream()
-                    .filter(q -> q.getQuestionText() != null && q.getQuestionText().contains("What is the core concept here?"))
-                    .toList();
+        // Clean up pre-seeded dummy questions only if dummy questions actually exist
+        if (questionRepository.existsByQuestionTextContaining("What is the core concept here?")) {
+            List<Question> seeded = questionRepository.findByQuestionTextContaining("What is the core concept here?");
             if (!seeded.isEmpty()) {
                 questionRepository.deleteAll(seeded);
             }
         }
 
-        seedSyllabus("CBSE", 11, "CBSE Class 11 CS", new String[]{
-                "CBSE 11 - Computer Systems & Architecture",
-                "CBSE 11 - Computational Thinking & Python",
-                "CBSE 11 - Data Representation & Logic Gates",
-                "CBSE 11 - Cyber Safety & Ethics"
-        });
+        // Fast check before seeding CBSE syllabus
+        if (!unitRepository.existsBySchoolIsNullAndBoardAndClassLevel("CBSE", 11)) {
+            seedSyllabus("CBSE", 11, "CBSE Class 11 CS", new String[]{
+                    "CBSE 11 - Computer Systems & Architecture",
+                    "CBSE 11 - Computational Thinking & Python",
+                    "CBSE 11 - Data Representation & Logic Gates",
+                    "CBSE 11 - Cyber Safety & Ethics"
+            });
+        }
 
-        seedSyllabus("CBSE", 12, "CBSE Class 12 CS", new String[]{
-                "CBSE 12 - Advanced Python & Data Structures",
-                "CBSE 12 - Computer Networks & Protocols",
-                "CBSE 12 - Database Concepts & SQL",
-                "CBSE 12 - Interface Python with SQL"
-        });
+        if (!unitRepository.existsBySchoolIsNullAndBoardAndClassLevel("CBSE", 12)) {
+            seedSyllabus("CBSE", 12, "CBSE Class 12 CS", new String[]{
+                    "CBSE 12 - Advanced Python & Data Structures",
+                    "CBSE 12 - Computer Networks & Protocols",
+                    "CBSE 12 - Database Concepts & SQL",
+                    "CBSE 12 - Interface Python with SQL"
+            });
+        }
 
         // Seed Computer Quest Demo School State Board Class 11 and Class 12 Syllabus
         stateBoardSyllabusSeeder.seedDemoSchoolSyllabus();

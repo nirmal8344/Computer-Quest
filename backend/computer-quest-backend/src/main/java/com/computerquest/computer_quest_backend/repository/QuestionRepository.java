@@ -56,6 +56,10 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     long countBySchool_Id(Long schoolId);
 
+    boolean existsByQuestionTextContaining(String keyword);
+
+    List<Question> findByQuestionTextContaining(String keyword);
+
     List<Question> findBySchoolIsNull();
 
     @Query(value = """

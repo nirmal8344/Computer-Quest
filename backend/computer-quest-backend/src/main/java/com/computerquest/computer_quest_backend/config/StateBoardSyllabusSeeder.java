@@ -45,19 +45,20 @@ public class StateBoardSyllabusSeeder {
     }
 
     public void seedDemoSchoolSyllabus() {
-        School demoSchool = schoolRepository.findByName("Computer Quest Demo School")
-                .orElseGet(() -> schoolRepository.save(new School("Computer Quest Demo School")));
+        School demoSchool = schoolRepository.findByName("Computer Quest Demo School").orElse(null);
+        if (demoSchool != null && questionRepository.countBySchool_Id(demoSchool.getId()) >= 680) {
+            return;
+        }
+
+        if (demoSchool == null) {
+            demoSchool = schoolRepository.save(new School("Computer Quest Demo School"));
+        }
 
         // Ensure 11th Standard and 12th Standard exist for Demo School in STATE_BOARD
         List<SchoolClass> demoClasses = schoolClassRepository.findBySchool_IdAndBoard(demoSchool.getId(), "STATE_BOARD");
         if (demoClasses.isEmpty()) {
             schoolClassRepository.save(new SchoolClass("11th Standard", 11, "STATE_BOARD", demoSchool));
             schoolClassRepository.save(new SchoolClass("12th Standard", 12, "STATE_BOARD", demoSchool));
-        }
-
-        long count = questionRepository.countBySchool_Id(demoSchool.getId());
-        if (count >= 680) {
-            return;
         }
 
         // Clean up pre-existing questions/chapters for Demo School State Board if partial seed
