@@ -39,44 +39,28 @@ export default function TeacherGuide({
       </div>
 
       <div className="speech-bubble-wrapper">
-        <div className="speech-bubble-tail" />
-        <div className="speech-bubble-content">
-          <div className="speech-header-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
-            <span className="teacher-title-badge" style={{ fontWeight: 800, fontSize: "0.85rem", color: "#d97706" }}>
-              👩‍🏫 {title}
-            </span>
-            <button
-              className="voice-replay-btn"
-              onClick={handleReplayVoice}
-              title="Replay Teacher Voice"
-              type="button"
-              style={{
-                background: "rgba(245, 158, 11, 0.15)",
-                border: "1px solid rgba(245, 158, 11, 0.4)",
-                borderRadius: "50%",
-                width: "28px",
-                height: "28px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "#d97706",
-                fontSize: "0.9rem",
-              }}
-            >
-              🔊
-            </button>
-          </div>
-
-          <p className="speech-text">{speech}</p>
-
-          {onAction && (
-            <button className="btn btn-emerald speech-action-btn" onClick={onAction}>
-              <span>{actionText}</span>
-              <ForwardArrowIcon size={18} />
-            </button>
-          )}
+        <div className="speech-header-row">
+          <span className="teacher-title-badge">
+            👩‍🏫 {title}
+          </span>
+          <button
+            className="voice-replay-btn"
+            onClick={handleReplayVoice}
+            title="Replay Voice Guidance"
+            type="button"
+          >
+            🔊
+          </button>
         </div>
+
+        <p className="speech-text">{speech}</p>
+
+        {onAction && (
+          <button className="btn btn-peach speech-action-btn" onClick={onAction}>
+            <span>{actionText}</span>
+            <ForwardArrowIcon size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

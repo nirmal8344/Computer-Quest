@@ -168,12 +168,20 @@ public class QuestionService {
                 rawResult = schoolQuestions;
                 return filterUnattemptedIfAvailable(rawResult, userId);
             }
-            // Fallback to global seeded questions (school IS NULL) - NEVER return another school's questions!
+            // Fallback to global seeded questions (school IS NULL) or matching board/class
             if (board != null && classLevel != null) {
                 rawResult = questionRepository.findBySchoolIsNullAndBoardAndClassLevelAndUnitAndChapterAndMission(
                         board, classLevel, unit, chapter, mission
                 );
-                return filterUnattemptedIfAvailable(rawResult, userId);
+                if (!rawResult.isEmpty()) {
+                    return filterUnattemptedIfAvailable(rawResult, userId);
+                }
+                rawResult = questionRepository.findByBoardAndClassLevelAndUnitAndChapterAndMission(
+                        board, classLevel, unit, chapter, mission
+                );
+                if (!rawResult.isEmpty()) {
+                    return filterUnattemptedIfAvailable(rawResult, userId);
+                }
             }
             rawResult = questionRepository.findBySchoolIsNullAndUnitAndChapterAndMission(unit, chapter, mission);
             return filterUnattemptedIfAvailable(rawResult, userId);
@@ -185,6 +193,13 @@ public class QuestionService {
             );
             if (!filtered.isEmpty()) {
                 rawResult = filtered;
+                return filterUnattemptedIfAvailable(rawResult, userId);
+            }
+            List<Question> anySchoolQ = questionRepository.findByBoardAndClassLevelAndUnitAndChapterAndMission(
+                    board, classLevel, unit, chapter, mission
+            );
+            if (!anySchoolQ.isEmpty()) {
+                rawResult = anySchoolQ;
                 return filterUnattemptedIfAvailable(rawResult, userId);
             }
         }

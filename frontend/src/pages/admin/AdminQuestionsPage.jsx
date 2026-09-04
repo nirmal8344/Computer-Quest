@@ -167,6 +167,13 @@ export default function AdminQuestionsPage() {
         <div className="admin-field">
           <label>Class</label>
           <select value={selectedClass} onChange={(e) => setSelectedClass(Number(e.target.value))}>
+            <option value={4}>Class 4</option>
+            <option value={5}>Class 5</option>
+            <option value={6}>Class 6</option>
+            <option value={7}>Class 7</option>
+            <option value={8}>Class 8</option>
+            <option value={9}>Class 9</option>
+            <option value={10}>Class 10</option>
             <option value={11}>Class 11</option>
             <option value={12}>Class 12</option>
           </select>
@@ -284,6 +291,13 @@ export default function AdminQuestionsPage() {
                 <div className="admin-field">
                   <label>Class</label>
                   <select value={formClass} onChange={(e) => setFormClass(Number(e.target.value))} required>
+                    <option value={4}>Class 4</option>
+                    <option value={5}>Class 5</option>
+                    <option value={6}>Class 6</option>
+                    <option value={7}>Class 7</option>
+                    <option value={8}>Class 8</option>
+                    <option value={9}>Class 9</option>
+                    <option value={10}>Class 10</option>
                     <option value={11}>Class 11</option>
                     <option value={12}>Class 12</option>
                   </select>

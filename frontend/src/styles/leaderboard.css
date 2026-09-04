@@ -1,274 +1,202 @@
-.leaderboard-screen {
+/* Modern Leaderboard Page Styling */
+
+.leaderboard-modern-screen {
   min-height: 100vh;
   min-height: 100dvh;
-  width: 100vw;
-  max-width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  padding: 30px 20px 80px;
+  padding: 16px 20px 100px;
   box-sizing: border-box;
   position: relative;
-  user-select: none;
-  overscroll-behavior-y: none;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-/* Floating Back Button */
-.leaderboard-back-btn {
-  position: absolute;
-  top: 24px;
-  left: 24px;
+.leaderboard-top-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  color: #ffffff;
-  font-family: var(--font-game, sans-serif);
-  font-weight: 800;
-  font-size: 0.88rem;
-  padding: 8px 16px;
-  border-radius: 14px;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10;
-}
-
-.leaderboard-back-btn:hover {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: rgba(255, 255, 255, 0.65);
-  transform: translateY(-2px);
-}
-
-.leaderboard-body {
-  max-width: 760px;
+  justify-content: space-between;
   width: 100%;
-  margin: 40px auto 0;
-  z-index: 2;
+  max-width: 680px;
+  margin: 0 auto 16px;
 }
 
-.leaderboard-card {
-  padding: 36px 28px;
-  box-sizing: border-box;
-}
-
-.leaderboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 24px;
-  text-align: center;
-  border-bottom: 2px dashed #d97706;
-  padding-bottom: 16px;
-}
-
-.leaderboard-header h2 {
-  font-family: var(--font-game);
-  color: #451a03;
-  font-size: 2rem;
+.leaderboard-nav-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-main);
   margin: 0;
 }
 
-.school-sub-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 4px 0 0;
-  font-family: var(--font-game);
-  font-size: 0.9rem;
-  color: #78350f;
-  font-weight: 700;
+.leaderboard-body-container {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-.leaderboard-list {
+.leaderboard-main-card {
+  padding: 28px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 520px;
-  overflow-y: auto;
-  padding-right: 8px;
+  gap: 20px;
 }
 
-/* Custom Parchment Gold Scrollbar for Leaderboard */
-.leaderboard-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.leaderboard-list::-webkit-scrollbar-track {
-  background: rgba(217, 119, 6, 0.15);
-  border-radius: 10px;
-}
-
-.leaderboard-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
-  border-radius: 10px;
-  border: 1px solid #fef3c7;
-}
-
-.leaderboard-list::-webkit-scrollbar-thumb:hover {
-  background: #b45309;
-}
-
-.leaderboard-empty {
-  padding: 24px;
-  color: #78350f;
-  font-family: var(--font-game);
-  text-align: center;
-  font-size: 1.1rem;
-}
-
-.leaderboard-row {
-  display: grid;
-  grid-template-columns: 56px 1fr auto auto;
+.leaderboard-card-header {
+  display: flex;
   align-items: center;
   gap: 16px;
-  padding: 14px 20px;
-  background: rgba(254, 243, 199, 0.85);
-  border: 2px solid #d97706;
-  border-radius: var(--radius-md, 16px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: transform 0.15s ease;
+  border-bottom: 1px solid rgba(226, 232, 248, 0.8);
+  padding-bottom: 16px;
 }
 
-.leaderboard-row:hover {
-  transform: translateY(-2px);
-  background: #ffffff;
-}
-
-.leaderboard-row.me {
-  background: #dcfce7;
-  border-color: #22c55e;
-  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3);
-}
-
-.rank-badge-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #d97706;
+.leaderboard-trophy-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-xl);
+  background: #fefce8;
+  border: 1.5px solid #fef08a;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.rank-1 .rank-badge-box {
-  background: linear-gradient(180deg, #fef08a 0%, #eab308 100%);
-  border-color: #ca8a04;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
-}
-
-.rank-2 .rank-badge-box {
-  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-  border-color: #94a3b8;
-}
-
-.rank-3 .rank-badge-box {
-  background: linear-gradient(180deg, #fed7aa 0%, #c2410c 100%);
-  border-color: #ea580c;
-  color: #ffffff;
-}
-
-.rank-text {
-  font-family: var(--font-game);
-  font-weight: 900;
-  font-size: 1rem;
-  color: #451a03;
-}
-
-.rank-3 .rank-text {
-  color: #ffffff;
-}
-
-.lb-name {
-  font-family: var(--font-game);
+.leaderboard-title {
+  font-size: 1.6rem;
   font-weight: 800;
-  font-size: 1.15rem;
-  color: #451a03;
+  color: var(--text-main);
+  margin: 0;
 }
 
-.lb-meta {
-  font-family: var(--font-game);
-  font-size: 0.9rem;
-  color: #78350f;
-  font-weight: 700;
-}
-
-.lb-xp-pill {
+.school-sub-tag {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
-  color: #451a03;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+.leaderboard-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.leaderboard-empty-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 24px;
+}
+
+.leaderboard-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 8px rgba(100, 116, 170, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.leaderboard-player-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(100, 116, 170, 0.1);
+}
+
+.leaderboard-player-row.is-current-user {
+  background: #f0fdf4;
+  border-color: #86efac;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.15);
+}
+
+.rank-position-disc {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-game);
-  font-weight: 900;
+  font-weight: 800;
   font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.rank-1 .rank-position-disc {
+  background: #fef08a;
+}
+.rank-2 .rank-position-disc {
+  background: #e2e8f0;
+}
+.rank-3 .rank-position-disc {
+  background: #ffedd5;
+}
+
+.rank-number-text {
+  font-family: var(--font-game);
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.player-meta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.player-username-text {
+  font-family: var(--font-game);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.player-progress-tag {
+  font-family: var(--font-game);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.player-xp-capsule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fefce8;
+  border: 1px solid #fef08a;
   padding: 6px 14px;
-  border-radius: 999px;
-  border: 1.5px solid #fde047;
+  border-radius: var(--radius-full);
+  font-family: var(--font-game);
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #854d0e;
 }
 
 @media (max-width: 600px) {
-  .leaderboard-screen {
-    padding: 20px 10px 60px;
+  .leaderboard-modern-screen {
+    padding: 12px 14px 90px;
   }
-  .leaderboard-body {
-    margin-top: 36px;
+  .leaderboard-main-card {
+    padding: 20px 16px;
   }
-  .leaderboard-card {
-    padding: 20px 14px;
+  .leaderboard-title {
+    font-size: 1.3rem;
   }
-  .leaderboard-header h2 {
-    font-size: 1.45rem;
-  }
-  .leaderboard-row {
-    grid-template-columns: 40px 1fr auto;
-    gap: 10px;
-    padding: 10px 12px;
-  }
-  .rank-badge-box {
-    width: 36px;
-    height: 36px;
-  }
-  .rank-text {
-    font-size: 0.88rem;
-  }
-  .lb-name {
-    font-size: 0.98rem;
-  }
-  .lb-xp-pill {
-    padding: 4px 10px;
-    font-size: 0.82rem;
-  }
-  .lb-meta {
-    display: none;
-  }
-  .leaderboard-back-btn {
-    top: 14px;
-    left: 14px;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .leaderboard-card {
-    padding: 14px 10px;
-  }
-  .leaderboard-row {
-    grid-template-columns: 32px 1fr auto;
-    gap: 6px;
-    padding: 8px 8px;
+  .leaderboard-trophy-badge {
+    width: 48px;
+    height: 48px;
   }
 }

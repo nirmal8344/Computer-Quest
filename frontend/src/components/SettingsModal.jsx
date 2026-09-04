@@ -20,42 +20,44 @@ export default function SettingsModal({ onClose }) {
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-card panel-parchment" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+      <div className="modal-card settings-modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="settings-modal-header">
           <div className="modal-header-title">
-            <GearIcon size={28} />
-            <h2>GAME SETTINGS</h2>
+            <div className="settings-header-icon">
+              <GearIcon size={22} />
+            </div>
+            <h2>Game Settings</h2>
           </div>
-          <button className="close-btn" onClick={onClose} title="Close">
-            <CloseIcon size={22} />
+          <button className="topbar-circle-btn" onClick={onClose} title="Close">
+            <CloseIcon size={18} />
           </button>
         </div>
 
-        <div className="settings-section">
-          <div className="setting-row">
-            <span>Sound Effects (SFX)</span>
+        <div className="settings-controls-list">
+          <div className="setting-control-row">
+            <span className="setting-title-text">Sound Effects (SFX)</span>
             <button
-              className={`toggle-btn ${soundX ? "active" : ""}`}
+              className={`modern-toggle-pill ${soundX ? "active" : ""}`}
               onClick={() => setSoundX(!soundX)}
             >
               {soundX ? "ON" : "OFF"}
             </button>
           </div>
 
-          <div className="setting-row">
-            <span>Background Music</span>
+          <div className="setting-control-row">
+            <span className="setting-title-text">Background Music</span>
             <button
-              className={`toggle-btn ${music ? "active" : ""}`}
+              className={`modern-toggle-pill ${music ? "active" : ""}`}
               onClick={() => setMusic(!music)}
             >
               {music ? "ON" : "OFF"}
             </button>
           </div>
 
-          <div className="setting-row column">
+          <div className="setting-control-row column">
             <div className="setting-label-row">
-              <span>Master Volume</span>
-              <span>{volume}%</span>
+              <span className="setting-title-text">Master Volume</span>
+              <span className="volume-val-badge">{volume}%</span>
             </div>
             <input
               type="range"
@@ -63,20 +65,20 @@ export default function SettingsModal({ onClose }) {
               max="100"
               value={volume}
               onChange={(e) => setVolume(e.target.value)}
-              className="volume-slider"
+              className="modern-volume-slider"
             />
           </div>
         </div>
 
-        <div className="user-info-box">
-          <p>
+        <div className="user-profile-badge-box">
+          <p className="user-logged-info">
             Logged in as: <strong>{user?.username}</strong>
           </p>
-          <p className="role-tag">Role: {user?.role || "STUDENT"}</p>
+          <span className="user-role-chip">{user?.role || "STUDENT"}</span>
         </div>
 
-        <div className="modal-actions">
-          <button className="btn btn-red btn-block" onClick={handleLogout}>
+        <div className="settings-modal-actions">
+          <button className="btn btn-danger btn-block" onClick={handleLogout}>
             Sign Out / Switch Account
           </button>
           <button className="btn btn-ghost btn-block" onClick={onClose}>
@@ -87,4 +89,3 @@ export default function SettingsModal({ onClose }) {
     </div>
   );
 }
-

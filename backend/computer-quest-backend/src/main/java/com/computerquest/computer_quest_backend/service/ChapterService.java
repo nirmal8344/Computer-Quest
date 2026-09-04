@@ -112,7 +112,14 @@ public class ChapterService {
                 }
             }
             if (board != null && classLevel != null) {
-                return chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                List<Chapter> nullSchool = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                if (!nullSchool.isEmpty()) {
+                    return nullSchool;
+                }
+                List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
+                if (!anySchool.isEmpty()) {
+                    return anySchool;
+                }
             }
             return chapterRepository.findBySchoolIsNull();
         }
@@ -121,6 +128,10 @@ public class ChapterService {
             List<Chapter> filtered = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
             if (!filtered.isEmpty()) {
                 return filtered;
+            }
+            List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
+            if (!anySchool.isEmpty()) {
+                return anySchool;
             }
         }
 

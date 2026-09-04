@@ -13,12 +13,11 @@ import {
   StarIcon,
   CheckIcon,
   ForwardArrowIcon,
+  BackArrowIcon,
   GearIcon,
 } from "../components/GameIcons.jsx";
-import mapBookBg from "../assets/images/map_book_bg.jpg";
 import teacherImg from "../assets/images/teacher_adriane.jpg";
 import "../styles/mission.css";
-import "../styles/map.css";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
 
@@ -34,7 +33,7 @@ export default function MissionPage() {
   const [selected, setSelected] = useState(null);
   const [feedback, setFeedback] = useState(null); // { correct, xp, lives }
   const [outcome, setOutcome] = useState(null); // MISSION_COMPLETE | MISSION_FAILED
-  const [stage, setStage] = useState("BRIEFING"); // BRIEFING -> PLAYING -> RESULT
+  const [stage, setStage] = useState("PLAYING"); // Directly start in gameplay screen
   const [error, setError] = useState("");
   const [xp, setXp] = useState(null);
   const [lives, setLives] = useState(null);
@@ -46,17 +45,22 @@ export default function MissionPage() {
   useEffect(() => {
     if (meta && meta.chapterId) return;
     chapterApi
-      .getAll({ userId: user.id })
+      .getAll({ userId: user?.id })
       .then((chapters) => {
-        const ch = chapters.find((c) => String(c.id) === String(chapterId));
-        if (!ch) throw new Error("Chapter not found.");
+        if (!chapters || chapters.length === 0) throw new Error("No chapters available.");
+        const ch =
+          chapters.find(
+            (c) =>
+              String(c.id) === String(chapterId) ||
+              String(c.chapterNumber) === String(chapterId)
+          ) || chapters[0];
         setMeta((prev) => ({
           ...prev,
-          unitId: prev?.unitId || 1,
+          unitId: prev?.unitId || ch.unitNumber || 1,
           chapterId: ch.id,
-          unit: ch.unit,
+          unit: ch.unit || "Unit 1",
           chapterName: ch.chapterName,
-          missionNumber: Number(missionNumber),
+          missionNumber: Number(missionNumber) || 1,
           gameType:
             prev?.gameType ||
             (Number(missionNumber) === 1 || Number(missionNumber) === 3
@@ -67,12 +71,12 @@ export default function MissionPage() {
         }));
       })
       .catch((err) => setError(err.message));
-  }, [meta, chapterId, missionNumber, user.id]);
+  }, [meta, chapterId, missionNumber, user?.id]);
 
   const loadQuestions = () => {
-    if (!meta) return;
+    if (!meta || !user?.id) return;
     questionApi
-      .getForMission(meta.unit, meta.chapterName, meta.missionNumber, { userId: user.id })
+      .getForMission(meta.unit, meta.chapterName, meta.missionNumber, { userId: user?.id })
       .then((raw) => {
         const cleaned = raw.map(({ correctAnswer, ...rest }) => rest);
         setQuestions(cleaned);
@@ -82,7 +86,7 @@ export default function MissionPage() {
 
   useEffect(() => {
     loadQuestions();
-  }, [meta, user.id]);
+  }, [meta, user?.id]);
 
   const current = questions?.[index];
 
@@ -92,7 +96,7 @@ export default function MissionPage() {
   };
 
   const handleSubmit = async () => {
-    if ((selected === null || selected === "") || !current) return;
+    if ((selected === null || selected === "") || !current || !user?.id) return;
     setSubmitting(true);
     setError("");
     try {
@@ -126,48 +130,48 @@ export default function MissionPage() {
     navigate(`/map?unitId=${uId}&chapterId=${cId}`);
   };
 
-  // Shared Floating Top Bar Component
-  const renderMapTopBar = () => (
-    <div className="map-top-bar">
+  // Shared Top Controls Bar
+  const renderMissionTopBar = () => (
+    <header className="mission-top-bar">
       <div className="lives-container">
         {[1, 2, 3].map((num) => (
-          <HeartIcon key={num} size={28} filled={num <= (lives ?? 3)} />
+          <HeartIcon key={num} size={24} filled={num <= (lives ?? 3)} />
         ))}
+        <span className="lives-count-text">{lives ?? 3} Lives</span>
       </div>
 
       <div className="top-bar-right">
-        <button className="icon-btn-round home-btn" onClick={handleBackToMap} title="Back to Missions">
-          <span className="btn-glyph">⬅️</span>
+        <button className="topbar-circle-btn" onClick={handleBackToMap} title="Back to Missions">
+          <BackArrowIcon size={18} />
         </button>
 
         <button
-          className="icon-btn-round help-btn"
+          className="topbar-circle-btn help-btn"
           onClick={() => setShowTeacherPopup(true)}
           title="Teacher Guidance"
         >
-          <span className="btn-glyph">❓</span>
-          <span className="btn-badge">4</span>
+          <span className="help-icon">👩‍🏫</span>
         </button>
 
         <button
-          className="icon-btn-round settings-btn"
+          className="topbar-circle-btn"
           onClick={() => setShowSettings(true)}
           title="Settings"
         >
-          <GearIcon size={22} />
+          <GearIcon size={18} />
         </button>
       </div>
-    </div>
+    </header>
   );
 
   if (error) {
     return (
-      <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-        {renderMapTopBar()}
-        <div className="mission-container">
-          <div className="error-banner mission-error">{error}</div>
-          <button className="btn btn-ghost" onClick={handleBackToMap}>
-            <MapIcon size={20} />
+      <div className="mission-modern-screen">
+        {renderMissionTopBar()}
+        <div className="mission-content-box">
+          <div className="error-banner">{error}</div>
+          <button className="btn btn-primary" onClick={handleBackToMap}>
+            <MapIcon size={18} />
             <span>Back to Missions</span>
           </button>
         </div>
@@ -178,51 +182,53 @@ export default function MissionPage() {
 
   if (!meta || !questions) {
     return (
-      <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-        {renderMapTopBar()}
-        <Loader label="Loading game mission..." />
+      <div className="mission-modern-screen">
+        {renderMissionTopBar()}
+        <Loader label="Loading mission questions..." />
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       </div>
     );
   }
 
-  // Stage 1: Pre-Mission Briefing - Teacher Adriane gives instructions
+  // Stage 1: Pre-Mission Briefing
   if (stage === "BRIEFING") {
     return (
-      <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-        {renderMapTopBar()}
+      <div className="mission-modern-screen">
+        {renderMissionTopBar()}
 
-        <div className="mission-container">
-          <div className="briefing-card panel-parchment">
+        <div className="mission-content-box">
+          <div className="cq-card mission-briefing-card">
             <div className="briefing-header">
-              <span className="briefing-tag">
-                {(meta.gameType || "MISSION").toUpperCase()} — MISSION {meta.missionNumber}
+              <span className="briefing-badge">
+                {(meta.gameType || "MISSION").toUpperCase()} · MISSION {meta.missionNumber}
               </span>
-              <h2>{meta.chapterName} — Mission {meta.missionNumber}</h2>
+              <h2 className="briefing-title">{meta.chapterName}</h2>
+              <p className="briefing-subtitle">Challenge Mission {meta.missionNumber}</p>
             </div>
 
             <TeacherGuide
               title="Teacher Adriane"
-              speech={`Explorer, welcome to Mission ${meta.missionNumber}! In this challenge, you must answer all 5 computer science questions correctly. Each correct answer earns +10 XP. Lose 3 lives and you must retry. Are you ready?`}
+              speech={`Welcome, explorer! In this challenge, answer all 5 questions to earn 5 stars and +10 XP per question. Protect your 3 lives and complete the quest!`}
               mood="excited"
-              actionText="Start Mission"
+              actionText="Start Challenge"
               onAction={() => setStage("PLAYING")}
             />
           </div>
         </div>
 
         {showTeacherPopup && (
-          <div className="teacher-popup-backdrop" onClick={() => setShowTeacherPopup(false)}>
+          <div className="modal-backdrop" onClick={() => setShowTeacherPopup(false)}>
             <div className="teacher-popup-card" onClick={(e) => e.stopPropagation()}>
               <div className="teacher-avatar-box">
                 <img src={teacherImg} alt="Teacher Adriane" className="teacher-avatar-img" />
               </div>
 
               <div className="teacher-speech-bubble">
+                <span className="teacher-badge-name">👩‍🏫 Teacher Adriane</span>
                 <p className="speech-text">
-                  Explorer, welcome to Mission {meta.missionNumber}! Answer all 5 questions to earn 5 stars and unlock the next mission!
+                  Complete all 5 questions correctly to earn 5 stars and unlock the next mission!
                 </p>
-                <button className="teacher-ok-btn" onClick={() => setShowTeacherPopup(false)}>
+                <button className="btn btn-peach btn-sm-card" onClick={() => setShowTeacherPopup(false)}>
                   OK
                 </button>
               </div>
@@ -235,65 +241,58 @@ export default function MissionPage() {
     );
   }
 
-  // Stage 3: Mission Outcome (MISSION_COMPLETE / MISSION_FAILED)
+  // Stage 3: Mission Outcome
   if (stage === "RESULT" || outcome) {
     const isChapterComplete = outcome === "MISSION_COMPLETE" && Number(meta.missionNumber) === 4;
 
     return (
-      <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-        {renderMapTopBar()}
-        <div className="mission-container">
-          <div className="outcome-card panel-parchment">
+      <div className="mission-modern-screen">
+        {renderMissionTopBar()}
+        <div className="mission-content-box">
+          <div className="cq-card outcome-result-card">
             {outcome === "MISSION_COMPLETE" ? (
-              isChapterComplete ? (
-                <>
-                  <div className="outcome-badge-icon">
-                    <TrophyIcon size={72} />
+              <>
+                <div className="outcome-trophy-box">
+                  <TrophyIcon size={64} />
+                </div>
+                <h2 className="outcome-headline success">
+                  {isChapterComplete ? "CHAPTER COMPLETE!" : "MISSION COMPLETE!"}
+                </h2>
+                <p className="outcome-description">
+                  {isChapterComplete
+                    ? `Outstanding work! You completed all 4 missions in ${meta.chapterName} and earned 5 Stars! The next chapter has been unlocked!`
+                    : `Great job! You answered all 5 questions correctly in Mission ${meta.missionNumber} and earned 5 Stars!`}
+                </p>
+
+                <div className="outcome-stats-row">
+                  <div className="stat-pill-result">
+                    <StarIcon size={18} filled={true} />
+                    <span>5 Stars Earned</span>
                   </div>
-                  <h1 className="outcome-title-complete">CHAPTER COMPLETE!</h1>
-                  <p className="outcome-sub">
-                    Incredible job! You completed all 4 missions in <strong>{meta.chapterName}</strong> and earned 5 Stars! The next chapter has been unlocked!
-                  </p>
-                  <div className="outcome-stats-box">
-                    <span className="stat-item"><StarIcon size={20} filled={true} /> 5 Stars Earned</span>
-                    <span className="stat-item"><HeartIcon size={20} /> Remaining Lives: {lives ?? 3}</span>
+                  <div className="stat-pill-result">
+                    <HeartIcon size={18} />
+                    <span>{lives ?? 3} Lives Left</span>
                   </div>
-                  <button className="btn btn-emerald btn-lg btn-block" onClick={handleBackToMap}>
-                    <MapIcon size={22} />
-                    <span>Return to Map & View Next Chapter</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="outcome-badge-icon">
-                    <TrophyIcon size={72} />
-                  </div>
-                  <h1 className="outcome-title-complete">MISSION COMPLETE!</h1>
-                  <p className="outcome-sub">
-                    Great work! You completed 5/5 questions in Mission {meta.missionNumber} and earned 5 Stars! The next mission is unlocked!
-                  </p>
-                  <div className="outcome-stats-box">
-                    <span className="stat-item"><StarIcon size={20} filled={true} /> 5 Stars Earned</span>
-                    <span className="stat-item"><HeartIcon size={20} /> Remaining Lives: {lives ?? 3}</span>
-                  </div>
-                  <button className="btn btn-emerald btn-lg btn-block" onClick={handleBackToMap}>
-                    <MapIcon size={22} />
-                    <span>Continue to Next Mission</span>
-                  </button>
-                </>
-              )
+                </div>
+
+                <button className="btn btn-peach btn-lg btn-block" onClick={handleBackToMap}>
+                  <MapIcon size={20} />
+                  <span>{isChapterComplete ? "View Next Chapter" : "Continue to Next Mission"}</span>
+                </button>
+              </>
             ) : (
               <>
-                <div className="outcome-badge-icon">
-                  <FailedIcon size={72} />
+                <div className="outcome-trophy-box">
+                  <FailedIcon size={64} />
                 </div>
-                <h1 className="outcome-title-failed">MISSION FAILED</h1>
-                <p className="outcome-sub">
-                  You ran out of lives before completing all 5 questions! No stars were awarded. Your lives have been restored to 3. Try again!
+                <h2 className="outcome-headline failed">MISSION FAILED</h2>
+                <p className="outcome-description">
+                  You ran out of lives before finishing all 5 questions. Your 3 lives have been restored. Try again!
                 </p>
-                <div className="outcome-actions">
+
+                <div className="outcome-actions-vertical">
                   <button
-                    className="btn btn-amber btn-lg btn-block"
+                    className="btn btn-peach btn-lg btn-block"
                     onClick={() => {
                       setOutcome(null);
                       setStage("BRIEFING");
@@ -306,8 +305,8 @@ export default function MissionPage() {
                     <span>Retry Mission</span>
                   </button>
                   <button className="btn btn-ghost btn-block" onClick={handleBackToMap}>
-                    <MapIcon size={20} />
-                    <span>Return to Missions</span>
+                    <MapIcon size={18} />
+                    <span>Back to Missions</span>
                   </button>
                 </div>
               </>
@@ -319,18 +318,17 @@ export default function MissionPage() {
     );
   }
 
-  // Stage 2: Actual Gameplay (No Questions fallback)
+  // Stage 2: Actual Gameplay
   if (!current) {
     return (
-      <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-        {renderMapTopBar()}
-        <div className="mission-container">
-          <div className="outcome-card panel-parchment">
+      <div className="mission-modern-screen">
+        {renderMissionTopBar()}
+        <div className="mission-content-box">
+          <div className="cq-card outcome-result-card">
             <h2>No Questions Available</h2>
             <p>This mission doesn't have any questions yet.</p>
-            <button className="btn btn-emerald" onClick={handleBackToMap}>
-              <MapIcon size={20} />
-              <span>Back to Missions</span>
+            <button className="btn btn-peach" onClick={handleBackToMap}>
+              Back to Missions
             </button>
           </div>
         </div>
@@ -344,73 +342,52 @@ export default function MissionPage() {
     text: current[`option${key}`],
   })).filter((o) => o.text);
 
-  // Check Game Type for Question Display
   const isFillInBlank = Number(meta.missionNumber) === 2 || current.questionType === "FILL_BLANK";
   const isScenario = Number(meta.missionNumber) === 4 || current.questionType === "SCENARIO" || current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE";
 
   return (
-    <div className="mission-game-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-      {renderMapTopBar()}
+    <div className="mission-modern-screen">
+      {renderMissionTopBar()}
 
-      <div className="game-scene-container playing-mode">
-        {/* Question Card & Game-Specific Answer Format */}
-        <div className="question-game-card panel-parchment">
-          <div className="question-bubble">
-            <span className="q-number-chip">Q{index + 1}/5</span>
-            <div className="question-meta-text">
-              <span className="question-subject-title">
-                [{meta.board || "CBSE"} Class {meta.classLevel || 11}] {meta.chapterName} (Mission {meta.missionNumber} — {meta.gameType || (isFillInBlank ? "Fill in the Blank" : isScenario ? "Scenario Challenge" : "MCQ Quiz")}):
-              </span>
-              <h2 className="question-text">{current.questionText}</h2>
+      <div className="mission-content-box">
+        {/* Question Card */}
+        <div className="cq-card question-play-card">
+          {/* Progress Header */}
+          <div className="question-card-header">
+            <span className="question-step-chip">QUESTION {index + 1} OF 5</span>
+            <div className="question-progress-dots">
+              {[0, 1, 2, 3, 4].map((dotIdx) => (
+                <span
+                  key={dotIdx}
+                  className={`dot-indicator ${dotIdx === index ? "current" : dotIdx < index ? "done" : ""}`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Render ONLY the assigned game type */}
+          <div className="question-topic-sub">
+            [{meta.board || "CBSE"} Class {meta.classLevel || 11}] {meta.chapterName}
+          </div>
+
+          <h2 className="question-headline-text">{current.questionText}</h2>
+
+          {/* Interactive Answer Format */}
           {isFillInBlank ? (
-            <div className="blank-input-box" style={{ padding: "16px 0" }}>
+            <div className="blank-input-wrapper">
               <input
                 type="text"
-                className="fill-blank-input"
+                className="modern-blank-input"
                 placeholder="Type your answer here..."
                 value={selected || ""}
                 onChange={(e) => !feedback && setSelected(e.target.value)}
                 disabled={!!feedback}
-                style={{
-                  width: "100%",
-                  padding: "14px 18px",
-                  fontSize: "1.1rem",
-                  borderRadius: "8px",
-                  border: "2px solid #cbd5e1",
-                  outline: "none",
-                }}
               />
             </div>
           ) : isScenario && (current.questionType === "CODE_SQL" || current.questionType === "SCENARIO_CODE" || current.codeLanguage) && options.length === 0 ? (
-            <div className="code-editor-box" style={{ padding: "12px 0" }}>
-              <div className="code-editor-header" style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "8px",
-              }}>
-                <span className="code-language-badge" style={{
-                  display: "inline-block",
-                  padding: "4px 12px",
-                  borderRadius: "6px",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                  backgroundColor:
-                    current.codeLanguage === "Python" ? "#306998" :
-                    current.codeLanguage === "C" ? "#555" :
-                    current.codeLanguage === "Java" ? "#b07219" :
-                    current.codeLanguage === "SQL" ? "#e38d13" : "#475569",
-                  color: "#fff",
-                }}>
-                  {current.codeLanguage || "CODE"}
-                </span>
-                <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>Scenario Code Editor</span>
+            <div className="code-editor-box">
+              <div className="code-editor-header">
+                <span className="code-lang-pill">{current.codeLanguage || "CODE"}</span>
+                <span className="code-hint-text">Scenario Code Editor</span>
               </div>
               <textarea
                 className="code-editor-input"
@@ -425,22 +402,11 @@ export default function MissionPage() {
                 value={selected !== null ? selected : (current.optionA || "")}
                 onChange={(e) => !feedback && setSelected(e.target.value)}
                 disabled={!!feedback}
-                style={{
-                  width: "100%",
-                  padding: "14px 18px",
-                  fontFamily: "Courier New, monospace",
-                  fontSize: "1rem",
-                  borderRadius: "8px",
-                  border: "2px solid #334155",
-                  backgroundColor: "#1e293b",
-                  color: "#38bdf8",
-                  outline: "none",
-                }}
               />
             </div>
           ) : (
-            /* MCQ / Scenario Choice Buttons */
-            <div className="options-game-grid">
+            /* MCQ Option Buttons */
+            <div className="mcq-options-grid">
               {options.map((opt) => {
                 const isSelected = selected === opt.key;
                 const isCorrectFeedback = feedback && isSelected && feedback.correct;
@@ -449,47 +415,48 @@ export default function MissionPage() {
                 return (
                   <button
                     key={opt.key}
-                    className={`game-option-btn ${isSelected ? "selected" : ""} ${
+                    className={`mcq-option-pill ${isSelected ? "selected" : ""} ${
                       isCorrectFeedback ? "correct" : ""
                     } ${isWrongFeedback ? "wrong" : ""}`}
                     onClick={() => handleSelect(opt.key)}
                     disabled={!!feedback}
                   >
-                    <span className="option-badge">{opt.key}</span>
-                    <span className="option-text">{opt.text}</span>
+                    <span className="option-letter-badge">{opt.key}</span>
+                    <span className="option-content-text">{opt.text}</span>
                   </button>
                 );
               })}
             </div>
           )}
 
+          {/* Submit / Feedback Button */}
           {!feedback ? (
             <button
-              className="btn-submit-answer"
+              className="btn btn-peach btn-block btn-lg btn-submit-modern"
               disabled={(selected === null || selected === "") || submitting}
               onClick={handleSubmit}
             >
-              {submitting ? "SUBMITTING..." : "SUBMIT ANSWER"}
+              {submitting ? "Checking..." : "Submit Answer"}
             </button>
           ) : (
-            <div className={`feedback-card-banner ${feedback.correct ? "good" : "bad"}`}>
-              <div className="feedback-message">
+            <div className={`feedback-banner-card ${feedback.correct ? "is-good" : "is-bad"}`}>
+              <div className="feedback-text-content">
                 {feedback.correct ? (
                   <>
-                    <CheckIcon size={24} />
+                    <CheckIcon size={22} />
                     <span>Correct! +10 XP earned!</span>
                   </>
                 ) : (
                   <>
-                    <HeartIcon filled={false} size={24} />
-                    <span>Not quite right! You lost 1 life.</span>
+                    <HeartIcon filled={false} size={22} />
+                    <span>Incorrect! Lost 1 life.</span>
                   </>
                 )}
               </div>
 
-              <button className="btn btn-amber btn-next-q" onClick={handleNext}>
+              <button className="btn btn-dark-pill btn-next-question" onClick={handleNext}>
                 <span>Next Question</span>
-                <ForwardArrowIcon size={18} />
+                <ForwardArrowIcon size={16} />
               </button>
             </div>
           )}
@@ -497,17 +464,18 @@ export default function MissionPage() {
       </div>
 
       {showTeacherPopup && (
-        <div className="teacher-popup-backdrop" onClick={() => setShowTeacherPopup(false)}>
+        <div className="modal-backdrop" onClick={() => setShowTeacherPopup(false)}>
           <div className="teacher-popup-card" onClick={(e) => e.stopPropagation()}>
             <div className="teacher-avatar-box">
               <img src={teacherImg} alt="Teacher Adriane" className="teacher-avatar-img" />
             </div>
 
             <div className="teacher-speech-bubble">
+              <span className="teacher-badge-name">👩‍🏫 Teacher Adriane</span>
               <p className="speech-text">
-                Explorer, welcome to Mission {meta.missionNumber}! Complete all 5 questions to earn 5 stars and protect your lives. Good luck!
+                Answer carefully! You earn +10 XP for each correct answer and protect your 3 lives.
               </p>
-              <button className="teacher-ok-btn" onClick={() => setShowTeacherPopup(false)}>
+              <button className="btn btn-peach btn-sm-card" onClick={() => setShowTeacherPopup(false)}>
                 OK
               </button>
             </div>

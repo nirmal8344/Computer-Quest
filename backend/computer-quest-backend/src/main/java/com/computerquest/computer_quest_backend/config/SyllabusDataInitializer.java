@@ -22,6 +22,7 @@ public class SyllabusDataInitializer implements CommandLineRunner {
     private final QuestionRepository questionRepository;
     private final com.computerquest.computer_quest_backend.repository.AdminRepository adminRepository;
     private final StateBoardSyllabusSeeder stateBoardSyllabusSeeder;
+    private final Class4To10SyllabusSeeder class4To10SyllabusSeeder;
 
     public SyllabusDataInitializer(
             UnitRepository unitRepository,
@@ -29,13 +30,15 @@ public class SyllabusDataInitializer implements CommandLineRunner {
             MissionRepository missionRepository,
             QuestionRepository questionRepository,
             com.computerquest.computer_quest_backend.repository.AdminRepository adminRepository,
-            StateBoardSyllabusSeeder stateBoardSyllabusSeeder) {
+            StateBoardSyllabusSeeder stateBoardSyllabusSeeder,
+            Class4To10SyllabusSeeder class4To10SyllabusSeeder) {
         this.unitRepository = unitRepository;
         this.chapterRepository = chapterRepository;
         this.missionRepository = missionRepository;
         this.questionRepository = questionRepository;
         this.adminRepository = adminRepository;
         this.stateBoardSyllabusSeeder = stateBoardSyllabusSeeder;
+        this.class4To10SyllabusSeeder = class4To10SyllabusSeeder;
     }
 
     @Override
@@ -88,6 +91,9 @@ public class SyllabusDataInitializer implements CommandLineRunner {
 
         // Seed Computer Quest Demo School State Board Class 11 and Class 12 Syllabus
         stateBoardSyllabusSeeder.seedDemoSchoolSyllabus();
+
+        // Seed Computer Quest Demo School Classes 4 to 10 (CBSE & State Board)
+        class4To10SyllabusSeeder.seedClasses4To10();
     }
 
     private void seedSyllabus(String board, int classLevel, String unitName, String[] chapterNames) {

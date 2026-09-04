@@ -5,21 +5,15 @@ import { useAuth } from "../context/AuthContext";
 import SettingsModal from "../components/SettingsModal.jsx";
 import Loader from "../components/Loader.jsx";
 import {
-  HeartIcon,
   LockIcon,
   StarIcon,
   GearIcon,
   BackArrowIcon,
   ForwardArrowIcon,
+  BookIcon,
 } from "../components/GameIcons.jsx";
-import mapBookBgImg from "../assets/images/map_book_bg.jpg";
 import teacherImg from "../assets/images/teacher_adriane.jpg";
 import "../styles/map.css";
-
-// Map Flow Stages:
-// 1. 'UNITS'    -> Units Map (Start Adventure)
-// 2. 'CHAPTERS' -> Chapters Map (Unit Selected via URL param ?unitId=X)
-// 3. 'MISSIONS' -> Missions Map (Chapter Selected via URL param ?unitId=X&chapterId=Y)
 
 export default function MapPage() {
   const { user } = useAuth();
@@ -106,22 +100,18 @@ export default function MapPage() {
   const currentStageItems = useMemo(() => {
     if (mapStage === "UNITS") {
       return unitsData;
-    }
-    if (mapStage === "CHAPTERS") {
+    } else if (mapStage === "CHAPTERS") {
       if (!selectedUnit) return chaptersData;
-      return chaptersData.filter((ch) => {
-        const uName = selectedUnit.unitName || `Unit ${selectedUnit.unitNumber}`;
-        return ch.unit === uName || ch.unit === selectedUnit.unitName;
-      });
-    }
-    if (mapStage === "MISSIONS") {
+      const uName = selectedUnit.unitName || `Unit ${selectedUnit.unitNumber}`;
+      return chaptersData.filter((ch) => ch.unit === uName || ch.unit === selectedUnit.unitName);
+    } else if (mapStage === "MISSIONS") {
       if (!selectedChapter) return missionsData;
       return missionsData.filter((m) => m.chapter?.id === selectedChapter.id);
     }
     return [];
   }, [mapStage, selectedUnit, selectedChapter, unitsData, chaptersData, missionsData]);
 
-  // Navigation pagination: show arrows ONLY if items exceed 5 per screen
+  // Navigation pagination: 5 items per page
   const ITEMS_PER_PAGE = 5;
   const totalPages = Math.ceil(currentStageItems.length / ITEMS_PER_PAGE) || 1;
   const visibleItems = currentStageItems.slice(
@@ -129,7 +119,7 @@ export default function MapPage() {
     (pageIndex + 1) * ITEMS_PER_PAGE
   );
 
-  // Back Navigation Action: returns 1 level up in the hierarchy
+  // Back Navigation Action
   const handleNavBack = () => {
     if (mapStage === "MISSIONS") {
       setSearchParams({ unitId: selectedUnit?.id || selectedUnit?.unitNumber || 1 });
@@ -177,229 +167,227 @@ export default function MapPage() {
     });
   };
 
-  // Breadcrumb Title Generation
-  const getBreadcrumbTitle = () => {
-    if (mapStage === "UNITS") return "Explore Units Map";
-    if (mapStage === "CHAPTERS") {
-      return selectedUnit?.unitName || `Unit ${selectedUnit?.unitNumber || 1}`;
-    }
-    if (mapStage === "MISSIONS") {
-      const uName = selectedUnit?.unitName || `Unit ${selectedUnit?.unitNumber || 1}`;
-      return `${uName} > Chapter ${selectedChapter?.chapterNumber || 1}`;
-    }
-    return "Map";
-  };
-
-  // Sub-Banner Config
-  const getBannerConfig = () => {
-    if (mapStage === "UNITS") {
-      return { title: "Explore Units", subtitle: "Complete units to unlock the next" };
-    }
-    if (mapStage === "CHAPTERS") {
-      return { title: "Explore Chapters", subtitle: "Complete chapters to unlock the next" };
-    }
-    return { title: "Explore Missions", subtitle: "Complete 5 questions to earn 5 stars & unlock next mission" };
-  };
-
   // Teacher Speech Text
   const getTeacherSpeech = () => {
     if (mapStage === "UNITS") {
-      return `Welcome, Explorer! You are entering Unit 1. In this unit, you will learn the basic concepts. Complete all chapters to move forward!`;
+      return `Welcome, Explorer! In this section, you will learn the core fundamentals of Computer Science. Complete each unit to advance!`;
     }
     if (mapStage === "CHAPTERS") {
-      return `Explore Chapters! Select a chapter to discover its missions.`;
+      return `Explore Chapters! Select a chapter to discover its quest missions.`;
     }
-    return `Explore Missions! Complete all 5 questions in a mission to earn 5 stars and unlock the next mission!`;
+    return `Explore Missions! Answer all 5 questions in each mission to earn 5 stars and level up!`;
   };
 
-  const banner = getBannerConfig();
-
   return (
-    <div className="map-game-screen" style={{ backgroundImage: `url(${mapBookBgImg})` }}>
-      {/* Top Controls Bar matching Reference Diagram */}
-      <div className="map-top-bar">
-        <div className="lives-container">
-          {[1, 2, 3].map((num) => (
-            <HeartIcon key={num} size={28} filled={num <= (gameData?.lives ?? 3)} />
-          ))}
+    <div className="map-clean-screen">
+      {/* Top Header Bar */}
+      <header className="map-top-bar">
+        <button className="topbar-circle-btn" onClick={handleNavBack} title="Back">
+          <BackArrowIcon size={18} />
+        </button>
+
+        <div className="map-header-center-pill">
+          {mapStage === "UNITS" && (
+            <span className="count-pill-badge">{unitsData.length} Units Available</span>
+          )}
+          {mapStage === "CHAPTERS" && (
+            <span className="count-pill-badge">{currentStageItems.length} Chapters in {selectedUnit?.unitName || "Unit"}</span>
+          )}
+          {mapStage === "MISSIONS" && (
+            <span className="count-pill-badge">{currentStageItems.length} Missions in Chapter {selectedChapter?.chapterNumber}</span>
+          )}
         </div>
 
         <div className="top-bar-right">
-          <button className="icon-btn-round home-btn" onClick={handleNavBack} title="Back">
-            <span className="btn-glyph">⬅️</span>
-          </button>
-
           <button
-            className="icon-btn-round help-btn"
+            className="topbar-circle-btn help-btn"
             onClick={() => setShowTeacherPopup(true)}
             title="Teacher Guidance"
           >
-            <span className="btn-glyph">❓</span>
-            <span className="btn-badge">4</span>
+            <span className="help-icon">👩‍🏫</span>
           </button>
 
           <button
-            className="icon-btn-round settings-btn"
+            className="topbar-circle-btn"
             onClick={() => setShowSettings(true)}
             title="Settings"
           >
-            <GearIcon size={22} />
+            <GearIcon size={18} />
           </button>
         </div>
-      </div>
+      </header>
 
-      {error && <div className="error-banner map-error">Couldn't load map: {error}</div>}
-      {loading && <Loader label="Opening the Quest Tome..." />}
-
-      {!loading && (
-        <div className="map-stage-wrapper">
-          {/* Main Book Component with Optional Page Navigation Arrows */}
-          <div className="tome-book-outer">
-            {/* Show Left Arrow ONLY if totalPages > 1 and pageIndex > 0 */}
-            {totalPages > 1 && pageIndex > 0 && (
-              <button
-                className="side-page-arrow arrow-left"
-                onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
-              >
-                <BackArrowIcon size={32} />
-              </button>
-            )}
-
-            {/* Open Tome Parchment Book */}
-            <div className="open-tome-book">
-              {/* Top-Left Breadcrumb Ribbon */}
-              <div className="breadcrumb-ribbon">
-                <span>{getBreadcrumbTitle()}</span>
-              </div>
-
-              {/* Connected Pathway SVG Line */}
-              <div className="pathway-container">
-                <svg className="path-svg" viewBox="0 0 800 400">
-                  <path
-                    d="M 120 180 Q 260 100 400 200 T 680 180"
-                    fill="none"
-                    stroke="#ca8a04"
-                    strokeWidth="8"
-                    strokeDasharray="12,8"
-                  />
-                </svg>
-
-                {/* Render Dynamic Nodes returned by Backend */}
-                <div className="nodes-layer">
-                  {visibleItems.length === 0 && (
-                    <div className="empty-nodes-msg">No items available for this level.</div>
-                  )}
-
-                  {visibleItems.map((item, idx) => {
-                    let nodeNumber = idx + 1 + pageIndex * ITEMS_PER_PAGE;
-                    let nodeLabel = "";
-                    let isUnlocked = true;
-                    let isCompleted = false;
-                    let onClickHandler = () => {};
-
-                    if (mapStage === "UNITS") {
-                      nodeNumber = item.unitNumber || idx + 1;
-                      const rawName = item.unitName || `Unit ${nodeNumber}`;
-                      nodeLabel = rawName.includes("–") ? rawName.split("–")[0].trim() : rawName;
-                      isUnlocked = nodeNumber <= (gameData?.currentChapter ? Math.ceil(gameData.currentChapter / 3) : 1);
-                      isCompleted = nodeNumber < (gameData?.currentChapter ? Math.ceil(gameData.currentChapter / 3) : 1);
-                      onClickHandler = () => isUnlocked && handleUnitClick(item);
-                    } else if (mapStage === "CHAPTERS") {
-                      nodeLabel = `${selectedUnit?.unitNumber || 1}.${item.chapterNumber || idx + 1}`;
-                      isUnlocked = item.unlocked || item.chapterNumber <= (gameData?.currentChapter ?? 1);
-                      isCompleted = item.chapterNumber < (gameData?.currentChapter ?? 1);
-                      onClickHandler = () => isUnlocked && handleChapterClick(item);
-                    } else if (mapStage === "MISSIONS") {
-                      nodeNumber = item.missionNumber || idx + 1;
-                      nodeLabel = `Mission ${nodeNumber}`;
-                      isUnlocked =
-                        selectedChapter?.chapterNumber < (gameData?.currentChapter ?? 1) ||
-                        (selectedChapter?.chapterNumber === (gameData?.currentChapter ?? 1) &&
-                          nodeNumber <= (gameData?.currentMission ?? 1));
-                      isCompleted =
-                        selectedChapter?.chapterNumber < (gameData?.currentChapter ?? 1) ||
-                        (selectedChapter?.chapterNumber === (gameData?.currentChapter ?? 1) &&
-                          nodeNumber < (gameData?.currentMission ?? 1));
-                      onClickHandler = () => isUnlocked && handleMissionClick(item);
-                    }
-
-                    return (
-                      <div
-                        key={item.id || idx}
-                        className={`map-node-anchor node-slot-${idx + 1}`}
-                      >
-                        {/* 5 Golden Stars on top of COMPLETED missions ONLY */}
-                        {mapStage === "MISSIONS" && isCompleted && (
-                          <div className="node-stars-row">
-                            {[1, 2, 3, 4, 5].map((num) => (
-                              <StarIcon key={num} size={14} filled={true} />
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Circular Node Button */}
-                        <button
-                          className={`circle-node-btn ${!isUnlocked ? "locked" : ""} ${
-                            isCompleted ? "completed" : ""
-                          } stage-${mapStage.toLowerCase()}`}
-                          onClick={onClickHandler}
-                          disabled={!isUnlocked}
-                        >
-                          <span className="node-text">
-                            {mapStage === "CHAPTERS"
-                              ? `${selectedUnit?.unitNumber || 1}.${item.chapterNumber || idx + 1}`
-                              : nodeNumber}
-                          </span>
-
-                          {!isUnlocked && (
-                            <div className="node-lock-badge">
-                              <LockIcon size={18} />
-                            </div>
-                          )}
-                        </button>
-
-                        {/* Node Label Below */}
-                        <div className="node-title-badge">
-                          <span>{nodeLabel}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Bottom Sub-Banner matching Reference Image */}
-              <div className="tome-bottom-banner">
-                <h4 className="banner-title">{banner.title}</h4>
-                <p className="banner-subtitle">{banner.subtitle}</p>
-              </div>
-            </div>
-
-            {/* Show Right Arrow ONLY if totalPages > 1 and pageIndex < totalPages - 1 */}
-            {totalPages > 1 && pageIndex < totalPages - 1 && (
-              <button
-                className="side-page-arrow arrow-right"
-                onClick={() => setPageIndex((p) => Math.min(totalPages - 1, p + 1))}
-              >
-                <ForwardArrowIcon size={32} />
-              </button>
-            )}
-          </div>
+      {error && (
+        <div className="map-error-wrapper">
+          <div className="error-banner">Couldn't load map: {error}</div>
         </div>
       )}
 
-      {/* Teacher Instruction Popup (Dialog) matching Reference Image */}
+      {loading && <Loader label="Opening your learning path..." />}
+
+      {!loading && (
+        <div className="map-content-container">
+          {/* Main Title Header */}
+          <div className="map-title-header">
+            <h1 className="map-main-title">
+              {mapStage === "UNITS" ? (
+                <>Learning <span className="title-highlight">Units</span></>
+              ) : mapStage === "CHAPTERS" ? (
+                <><span className="title-highlight">{selectedUnit?.unitName || "Chapters"}</span></>
+              ) : (
+                <>Chapter {selectedChapter?.chapterNumber}: <span className="title-highlight">{selectedChapter?.chapterName || "Missions"}</span></>
+              )}
+            </h1>
+          </div>
+
+          {/* Cards List */}
+          <div className="lesson-cards-list">
+            {visibleItems.length === 0 && (
+              <div className="empty-state-card">
+                <p>No items found for this selection.</p>
+                <button className="btn btn-primary" onClick={handleNavBack}>
+                  Back to Previous Level
+                </button>
+              </div>
+            )}
+
+            {visibleItems.map((item, idx) => {
+              let itemNumber = idx + 1 + pageIndex * ITEMS_PER_PAGE;
+              let itemTitle = "";
+              let itemSub = "";
+              let isUnlocked = true;
+              let isCompleted = false;
+              let progressBadge = "0/5";
+              let onClickHandler = () => {};
+
+              if (mapStage === "UNITS") {
+                itemNumber = item.unitNumber || idx + 1;
+                const rawName = item.unitName || `Unit ${itemNumber}`;
+                itemTitle = rawName;
+                itemSub = "Core computer science foundation and problem solving.";
+                isUnlocked = itemNumber <= (gameData?.currentChapter ? Math.ceil(gameData.currentChapter / 3) : 1);
+                isCompleted = itemNumber < (gameData?.currentChapter ? Math.ceil(gameData.currentChapter / 3) : 1);
+                progressBadge = isCompleted ? "Completed" : isUnlocked ? "In Progress" : "Locked";
+                onClickHandler = () => isUnlocked && handleUnitClick(item);
+              } else if (mapStage === "CHAPTERS") {
+                itemTitle = `Chapter ${item.chapterNumber}: ${item.chapterName}`;
+                itemSub = item.description || "Learn core computational concepts and mission challenges.";
+                isUnlocked = item.unlocked || item.chapterNumber <= (gameData?.currentChapter ?? 1);
+                isCompleted = item.chapterNumber < (gameData?.currentChapter ?? 1);
+                progressBadge = isCompleted ? "4/4" : isUnlocked ? "1/4" : "0/4";
+                onClickHandler = () => isUnlocked && handleChapterClick(item);
+              } else if (mapStage === "MISSIONS") {
+                itemNumber = item.missionNumber || idx + 1;
+                itemTitle = `Mission ${itemNumber}: ${
+                  item.missionNumber === 1 || item.missionNumber === 3
+                    ? "MCQ Quiz"
+                    : item.missionNumber === 2
+                    ? "Fill in the Blank"
+                    : "Scenario Challenge"
+                }`;
+                itemSub = "Complete 5 interactive questions to earn 5 stars!";
+                isUnlocked =
+                  selectedChapter?.chapterNumber < (gameData?.currentChapter ?? 1) ||
+                  (selectedChapter?.chapterNumber === (gameData?.currentChapter ?? 1) &&
+                    itemNumber <= (gameData?.currentMission ?? 1));
+                isCompleted =
+                  selectedChapter?.chapterNumber < (gameData?.currentChapter ?? 1) ||
+                  (selectedChapter?.chapterNumber === (gameData?.currentChapter ?? 1) &&
+                    itemNumber < (gameData?.currentMission ?? 1));
+                progressBadge = isCompleted ? "5/5" : isUnlocked ? "0/5" : "Locked";
+                onClickHandler = () => isUnlocked && handleMissionClick(item);
+              }
+
+              return (
+                <div
+                  key={item.id || idx}
+                  className={`lesson-item-card ${!isUnlocked ? "is-locked" : ""} ${
+                    isCompleted ? "is-completed" : ""
+                  }`}
+                  onClick={onClickHandler}
+                >
+                  <div className="card-main-details">
+                    <div className="lesson-badge-tag">
+                      <span>{mapStage === "UNITS" ? `UNIT ${itemNumber}` : mapStage === "CHAPTERS" ? `CHAPTER ${item.chapterNumber || itemNumber}` : `MISSION ${itemNumber}`}</span>
+                    </div>
+
+                    <h3 className="lesson-card-title">{itemTitle}</h3>
+                    <p className="lesson-card-desc">{itemSub}</p>
+
+                    <div className="lesson-action-row">
+                      {isUnlocked ? (
+                        <button className="btn btn-peach btn-sm-card">
+                          <span>{isCompleted ? "Review" : "Start"}</span>
+                        </button>
+                      ) : (
+                        <button className="btn btn-ghost btn-sm-card" disabled>
+                          <LockIcon size={16} />
+                          <span>Unlock</span>
+                        </button>
+                      )}
+
+                      {/* 5 Stars for Completed Missions */}
+                      {mapStage === "MISSIONS" && isCompleted && (
+                        <div className="stars-earned-pill">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <StarIcon key={s} size={14} filled={true} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="card-side-progress">
+                    <div className={`progress-badge-circle ${isCompleted ? "completed" : ""}`}>
+                      <span>{progressBadge}</span>
+                    </div>
+                    <div className="card-mini-mascot">
+                      <BookIcon size={34} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="map-pagination-row">
+              <button
+                className="pagination-arrow-btn"
+                disabled={pageIndex === 0}
+                onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
+              >
+                <BackArrowIcon size={18} />
+              </button>
+              <span className="pagination-text">
+                Page {pageIndex + 1} of {totalPages}
+              </span>
+              <button
+                className="pagination-arrow-btn"
+                disabled={pageIndex >= totalPages - 1}
+                onClick={() => setPageIndex((p) => Math.min(totalPages - 1, p + 1))}
+              >
+                <ForwardArrowIcon size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Teacher Instruction Popup */}
       {showTeacherPopup && (
-        <div className="teacher-popup-backdrop" onClick={() => setShowTeacherPopup(false)}>
+        <div className="modal-backdrop" onClick={() => setShowTeacherPopup(false)}>
           <div className="teacher-popup-card" onClick={(e) => e.stopPropagation()}>
             <div className="teacher-avatar-box">
               <img src={teacherImg} alt="Teacher Adriane" className="teacher-avatar-img" />
             </div>
 
             <div className="teacher-speech-bubble">
+              <span className="teacher-badge-name">👩‍🏫 Teacher Adriane</span>
               <p className="speech-text">{getTeacherSpeech()}</p>
-              <button className="teacher-ok-btn" onClick={() => setShowTeacherPopup(false)}>
-                OK
+              <button className="btn btn-peach btn-sm-card" onClick={() => setShowTeacherPopup(false)}>
+                Got it!
               </button>
             </div>
           </div>

@@ -4,14 +4,14 @@ import "./GameLogo.css";
 export default function GameLogo({ size = "large", className = "" }) {
   return (
     <div className={`cq-logo-wrapper ${size} ${className}`}>
-      {/* 3 Golden Stars on top */}
+      {/* 3 Glowing Stars */}
       <div className="cq-stars-row">
-        <span className="star side">⭐</span>
+        <span className="star side">✨</span>
         <span className="star center">⭐</span>
-        <span className="star side">⭐</span>
+        <span className="star side">✨</span>
       </div>
 
-      {/* Main Logo Container with 3D Graduation Cap on Left */}
+      {/* Main Logo Container with 3D Cap & Sleek Mixed-Weight Typography */}
       <div className="cq-logo-main-row">
         <div className="cq-grad-cap-box">
           <span className="cq-grad-cap-icon">🎓</span>
@@ -23,9 +23,10 @@ export default function GameLogo({ size = "large", className = "" }) {
         </div>
       </div>
 
-      {/* White Pill Badge: EDUCATIONAL ADVENTURE */}
+      {/* Modern Capsule Badge */}
       <div className="cq-ribbon-sub">
-        <span>EDUCATIONAL ADVENTURE</span>
+        <span className="badge-dot" />
+        <span>LEARNING ADVENTURE</span>
       </div>
     </div>
   );

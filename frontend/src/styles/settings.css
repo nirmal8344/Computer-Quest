@@ -1,141 +1,147 @@
-.modal-card {
-  width: 100%;
-  max-width: 480px;
-  padding: 32px 28px;
+/* Modern Settings Modal Styles */
+
+.settings-modal-box {
+  padding: 30px 28px;
 }
 
-.modal-header {
+.settings-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  border-bottom: 2px dashed #d97706;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(226, 232, 248, 0.8);
   padding-bottom: 14px;
 }
 
 .modal-header-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.modal-header h2 {
-  color: #451a03;
-  font-family: var(--font-game);
-  font-size: 1.6rem;
-  margin: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px;
+.settings-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: #f1f5f9;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease;
 }
 
-.close-btn:hover {
-  transform: scale(1.1);
+.settings-modal-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
 }
 
-.settings-section {
+.settings-controls-list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
-.setting-row {
+.setting-control-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--font-game);
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: #451a03;
 }
 
-.setting-row.column {
+.setting-control-row.column {
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
 }
 
 .setting-label-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  color: #451a03;
-  font-weight: 800;
 }
 
-.toggle-btn {
-  background: #cbd5e1;
-  border: 2px solid #94a3b8;
-  padding: 8px 24px;
-  border-radius: 999px;
+.setting-title-text {
   font-family: var(--font-game);
-  font-weight: 900;
-  font-size: 0.95rem;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.toggle-btn.active {
-  background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%);
-  color: #ffffff;
-  border-color: #86efac;
-  box-shadow: 0 4px 0 #14532d;
-}
-
-.volume-slider {
-  width: 100%;
-  accent-color: #d97706;
-  height: 8px;
-  cursor: pointer;
-}
-
-.user-info-box {
-  background: rgba(245, 158, 11, 0.15);
-  border: 2px solid #d97706;
-  padding: 14px 18px;
-  border-radius: var(--radius-md);
-  margin-bottom: 24px;
-  color: #451a03;
-  font-family: var(--font-game);
-  font-size: 1rem;
-}
-
-.role-tag {
-  margin: 4px 0 0 0;
-  font-size: 0.85rem;
-  color: #78350f;
   font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
 }
 
-.modal-actions {
+.volume-val-badge {
+  font-family: var(--font-game);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #6852d6;
+  background: #f5f3ff;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.modern-toggle-pill {
+  background: #e2e8f0;
+  border: none;
+  padding: 6px 18px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-game);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.modern-toggle-pill.active {
+  background: var(--grad-emerald);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+.modern-volume-slider {
+  width: 100%;
+  accent-color: #6852d6;
+  height: 6px;
+  cursor: pointer;
+}
+
+.user-profile-badge-box {
+  background: #f8f9fe;
+  border: 1px solid var(--card-border);
+  padding: 14px 18px;
+  border-radius: var(--radius-xl);
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-logged-info {
+  margin: 0;
+  font-family: var(--font-game);
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.user-role-chip {
+  font-family: var(--font-game);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #6852d6;
+  background: #ede9fe;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+}
+
+.settings-modal-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 @media (max-width: 500px) {
-  .modal-card {
-    padding: 20px 16px;
-  }
-  .modal-header h2 {
-    font-size: 1.3rem;
-  }
-  .setting-row {
-    font-size: 0.95rem;
-  }
-  .toggle-btn {
-    padding: 6px 16px;
-    font-size: 0.85rem;
+  .settings-modal-box {
+    padding: 20px 18px;
   }
 }
-
-

@@ -9,7 +9,7 @@ import {
   CoinIcon,
   GearIcon,
   BackArrowIcon,
-  CheckIcon,
+  MapIcon,
 } from "./GameIcons";
 import GameLogo from "./GameLogo.jsx";
 import "../styles/topbar.css";
@@ -37,11 +37,11 @@ export default function TopBar({ xp, lives, showNav = true }) {
         <div className="topbar-left-actions">
           {showNav && (
             <>
-              <button className="topbar-action-btn" onClick={() => navigate(-1)} title="Go Back">
-                <BackArrowIcon size={20} />
+              <button className="topbar-circle-btn" onClick={() => navigate(-1)} title="Go Back">
+                <BackArrowIcon size={18} />
               </button>
-              <button className="topbar-action-btn" onClick={() => navigate("/map")} title="Check Map">
-                <CheckIcon size={20} />
+              <button className="topbar-circle-btn" onClick={() => navigate("/map")} title="Explore Map">
+                <MapIcon size={18} />
               </button>
             </>
           )}
@@ -52,10 +52,10 @@ export default function TopBar({ xp, lives, showNav = true }) {
         </div>
 
         <div className="game-stats-cluster">
-          {/* Green 3D Magic Power Badge matching reference header */}
+          {/* Magic Power / XP Pill */}
           <div className="stat-badge magic-power-badge">
-            <MagicPowerIcon size={20} />
-            <span className="badge-value">{xp ?? 334} MAGIC POWER</span>
+            <MagicPowerIcon size={18} />
+            <span className="badge-value">{xp ?? 334} XP</span>
           </div>
 
           {typeof lives === "number" && (
@@ -65,27 +65,27 @@ export default function TopBar({ xp, lives, showNav = true }) {
           )}
 
           <div className="stat-badge coin-badge">
-            <CoinIcon size={20} />
-            <span className="badge-value">1</span>
+            <CoinIcon size={18} />
+            <span className="badge-value">Level {user?.currentChapter || 1}</span>
           </div>
         </div>
 
         <div className="game-topbar-right">
           <button
-            className="player-btn"
+            className="player-pill-btn"
             onClick={() => navigate("/profile")}
             title="View Profile"
           >
             <span className="player-avatar-circle">{user?.username?.[0]?.toUpperCase() ?? "P"}</span>
-            <span className="player-name-text">{user?.username}</span>
+            <span className="player-name-text">{user?.username || "Explorer"}</span>
           </button>
 
           <button
-            className="settings-gear-btn"
+            className="settings-circle-btn"
             onClick={() => setShowSettings(true)}
             title="Settings"
           >
-            <GearIcon size={22} />
+            <GearIcon size={20} />
           </button>
         </div>
       </header>
@@ -94,4 +94,3 @@ export default function TopBar({ xp, lives, showNav = true }) {
     </>
   );
 }
-

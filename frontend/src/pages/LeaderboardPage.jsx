@@ -3,8 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { leaderboardApi } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import Loader from "../components/Loader.jsx";
-import { TrophyIcon, StarIcon, SchoolIcon } from "../components/GameIcons.jsx";
-import mapBookBg from "../assets/images/map_book_bg.jpg";
+import {
+  TrophyIcon,
+  StarIcon,
+  SchoolIcon,
+  BackArrowIcon,
+  GearIcon,
+} from "../components/GameIcons.jsx";
+import SettingsModal from "../components/SettingsModal.jsx";
 import "../styles/leaderboard.css";
 
 export default function LeaderboardPage() {
@@ -12,6 +18,7 @@ export default function LeaderboardPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState(null);
   const [error, setError] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -31,7 +38,6 @@ export default function LeaderboardPage() {
       const filtered = list.filter((r) => r.user?.school?.id === user.school.id);
       if (filtered.length > 0) list = filtered;
     }
-    // Rank strictly by highest XP descending
     list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
     return list;
   }, [rows, user]);
@@ -39,52 +45,70 @@ export default function LeaderboardPage() {
   const schoolName = user?.school?.name;
 
   return (
-    <div className="leaderboard-screen" style={{ backgroundImage: `url(${mapBookBg})` }}>
-      {/* Floating Back to Lobby Button */}
-      <button className="leaderboard-back-btn" onClick={() => navigate("/lobby")}>
-        <span>⬅</span> BACK TO LOBBY
-      </button>
+    <div className="leaderboard-modern-screen">
+      {/* Top Header */}
+      <header className="leaderboard-top-bar">
+        <button className="topbar-circle-btn" onClick={() => navigate("/lobby")} title="Back to Lobby">
+          <BackArrowIcon size={18} />
+        </button>
 
-      <div className="leaderboard-body">
-        <div className="panel-parchment leaderboard-card">
-          <div className="leaderboard-header">
-            <TrophyIcon size={44} />
+        <h2 className="leaderboard-nav-title">Rankings & Leaderboard</h2>
+
+        <button className="topbar-circle-btn" onClick={() => setShowSettings(true)} title="Settings">
+          <GearIcon size={18} />
+        </button>
+      </header>
+
+      <div className="leaderboard-body-container">
+        <div className="cq-card leaderboard-main-card">
+          <div className="leaderboard-card-header">
+            <div className="leaderboard-trophy-badge">
+              <TrophyIcon size={42} />
+            </div>
             <div>
-              <h2>{schoolName ? `${schoolName.toUpperCase()} LEADERBOARD` : "EXPLORER LEADERBOARD"}</h2>
+              <h1 className="leaderboard-title">
+                {schoolName ? `${schoolName} Standings` : "Explorer Leaderboard"}
+              </h1>
               {schoolName && (
-                <p className="school-sub-header">
-                  <SchoolIcon size={16} /> <span>{schoolName} Standings</span>
+                <p className="school-sub-tag">
+                  <SchoolIcon size={16} /> <span>{schoolName} Top Students</span>
                 </p>
               )}
             </div>
           </div>
 
           {error && <div className="error-banner">{error}</div>}
-          {!schoolRows && !error && <Loader label="Ranking explorers..." />}
+          {!schoolRows && !error && <Loader label="Ranking top explorers..." />}
 
           {schoolRows && (
-            <div className="leaderboard-list">
-              {schoolRows.length === 0 && <p className="leaderboard-empty">No rankings yet for your school.</p>}
+            <div className="leaderboard-items-list">
+              {schoolRows.length === 0 && (
+                <p className="leaderboard-empty-text">No rankings available yet.</p>
+              )}
+
               {schoolRows.map((row, i) => {
                 const isMe = row.user?.id === user.id;
                 const rankNum = i + 1;
                 return (
                   <div
                     key={row.id}
-                    className={`leaderboard-row ${isMe ? "me" : ""} rank-${rankNum <= 3 ? rankNum : "other"}`}
+                    className={`leaderboard-player-row ${isMe ? "is-current-user" : ""} rank-${
+                      rankNum <= 3 ? rankNum : "other"
+                    }`}
                   >
-                    <div className="rank-badge-box">
-                      <span className="rank-text">#{rankNum}</span>
+                    <div className="rank-position-disc">
+                      <span className="rank-number-text">{rankNum <= 3 ? (rankNum === 1 ? "🥇" : rankNum === 2 ? "🥈" : "🥉") : `#${rankNum}`}</span>
                     </div>
 
-                    <span className="lb-name">{row.user?.username ?? "Unknown"}</span>
+                    <div className="player-meta-group">
+                      <span className="player-username-text">{row.user?.username ?? "Explorer"}</span>
+                      <span className="player-progress-tag">
+                        Ch {row.currentChapter || 1} · M{row.currentMission || 1}
+                      </span>
+                    </div>
 
-                    <span className="lb-meta">
-                      Ch {row.currentChapter} · M{row.currentMission}
-                    </span>
-
-                    <div className="lb-xp-pill">
-                      <StarIcon size={18} />
+                    <div className="player-xp-capsule">
+                      <StarIcon size={16} filled={true} />
                       <span>{(row.xp ?? 0).toLocaleString()} XP</span>
                     </div>
                   </div>
@@ -94,6 +118,8 @@ export default function LeaderboardPage() {
           )}
         </div>
       </div>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
