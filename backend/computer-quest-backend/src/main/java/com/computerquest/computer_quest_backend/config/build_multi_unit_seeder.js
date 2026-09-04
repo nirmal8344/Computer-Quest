@@ -82,13 +82,37 @@ out += `    }
         }
     }
 
+    private void cleanupOrphans(School school, String board, int classLevel, int maxUnitNum, int maxChNum) {
+        if (school == null) return;
+        List<Unit> units = unitRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel);
+        for (Unit u : units) {
+            if (u.getUnitNumber() > maxUnitNum) {
+                unitRepository.delete(u);
+            }
+        }
+        List<Chapter> chapters = chapterRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel);
+        for (Chapter ch : chapters) {
+            if (ch.getChapterNumber() != null && ch.getChapterNumber() > maxChNum) {
+                List<Mission> missions = missionRepository.findByChapter_Id(ch.getId());
+                for (Mission m : missions) {
+                    missionRepository.delete(m);
+                }
+                chapterRepository.delete(ch);
+            }
+        }
+    }
+
     private Unit getOrCreateUnit(School school, String board, int classLevel, int unitNumber, String unitName) {
         List<Unit> units = (school != null)
                 ? unitRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel)
                 : unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
 
         for (Unit u : units) {
-            if (u.getUnitNumber() == unitNumber || u.getUnitName().equalsIgnoreCase(unitName)) {
+            if (u.getUnitNumber() == unitNumber) {
+                if (!u.getUnitName().equalsIgnoreCase(unitName)) {
+                    u.setUnitName(unitName);
+                    return unitRepository.save(u);
+                }
                 return u;
             }
         }
@@ -112,10 +136,19 @@ out += `    }
             ch.setClassLevel(classLevel);
             if (school != null) ch.setSchool(school);
             ch = chapterRepository.save(ch);
-        } else if (ch.getUnit() == null || !ch.getUnit().equalsIgnoreCase(unitName) || !ch.getChapterName().equalsIgnoreCase(chName)) {
-            ch.setUnit(unitName);
-            ch.setChapterName(chName);
-            ch = chapterRepository.save(ch);
+        } else {
+            boolean changed = false;
+            if (ch.getUnit() == null || !ch.getUnit().equalsIgnoreCase(unitName)) {
+                ch.setUnit(unitName);
+                changed = true;
+            }
+            if (ch.getChapterName() == null || !ch.getChapterName().equalsIgnoreCase(chName)) {
+                ch.setChapterName(chName);
+                changed = true;
+            }
+            if (changed) {
+                ch = chapterRepository.save(ch);
+            }
         }
 
         for (int m = 1; m <= 4; m++) {
@@ -171,12 +204,21 @@ out += `    }
 
 datasets.forEach(d => {
   const methodName = `seed${d.board === 'CBSE' ? 'Cbse' : 'StateBoard'}Class${d.classLevel}`;
+  const maxUnitNum = d.units.length;
+  let maxChNum = 0;
+  d.units.forEach(u => {
+    u.chapters.forEach(ch => {
+      if (ch.num > maxChNum) maxChNum = ch.num;
+    });
+  });
+
   out += `\n    // ==========================================\n`;
   out += `    // ${d.board} CLASS ${d.classLevel}\n`;
   out += `    // ==========================================\n`;
   out += `    private void ${methodName}(School school) {\n`;
   out += `        String board = "${d.board}";\n`;
-  out += `        int classLevel = ${d.classLevel};\n\n`;
+  out += `        int classLevel = ${d.classLevel};\n`;
+  out += `        cleanupOrphans(school, board, classLevel, ${maxUnitNum}, ${maxChNum});\n\n`;
 
   d.units.forEach(u => {
     out += `        // --- ${u.unitName} ---\n`;
@@ -203,4 +245,4 @@ out += `}\n`;
 
 const targetFile = path.join(__dirname, 'Class4To10SyllabusSeeder.java');
 fs.writeFileSync(targetFile, out, 'utf8');
-console.log('Successfully generated Class4To10SyllabusSeeder.java with ' + datasets.length + ' class/board combinations across multi-units!');
+console.log('Successfully generated Class4To10SyllabusSeeder.java with automated orphan cleanup!');

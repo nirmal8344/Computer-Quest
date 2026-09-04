@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { gameApi } from "../api/client";
 import SettingsModal from "../components/SettingsModal.jsx";
 import studentAvatarImg from "../assets/images/student_avatar.jpg";
+import mascotGirlImg from "../assets/images/lobby_girl_mascot.jpg";
 import "../styles/lobby.css";
 
 export default function LobbyPage() {
@@ -33,12 +34,11 @@ export default function LobbyPage() {
 
   const username = game?.username || user?.username || "Explorer";
   const boardName = game?.board || user?.board || "STATE_BOARD";
-  const classLevel = game?.classLevel || user?.classLevel || 11;
+  const classLevel = game?.classLevel || user?.classLevel || 4;
 
   // Dynamic XP & Level calculations connected directly to backend data
   const totalXp = Number(game?.xp ?? user?.xp ?? 0);
   const currentChapter = game?.currentChapter ?? 1;
-  const currentMission = game?.currentMission ?? 1;
   const level = Math.max(1, currentChapter);
   const currentLevelXp = totalXp % 500;
   const targetXp = 500;
@@ -51,6 +51,11 @@ export default function LobbyPage() {
 
   return (
     <div className="lobby-game-viewport">
+      {/* Background Soft Glow Bubbles */}
+      <div className="lobby-ambient-bubble bubble-1" />
+      <div className="lobby-ambient-bubble bubble-2" />
+      <div className="lobby-ambient-bubble bubble-3" />
+
       {/* ========================================================
           TOP BAR (Profile Card on Left + Logout on Right)
           ======================================================== */}
@@ -81,7 +86,7 @@ export default function LobbyPage() {
           </div>
         </div>
 
-        {/* Top-Right Logout Button (No Notification Icon) */}
+        {/* Top-Right Logout Button */}
         <div className="lobby-header-actions">
           <button
             className="btn-lobby-logout"
@@ -92,8 +97,8 @@ export default function LobbyPage() {
             }}
           >
             <svg
-              width="22"
-              height="22"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -110,15 +115,24 @@ export default function LobbyPage() {
       </header>
 
       {/* ========================================================
-          CENTER HERO: 3D Logo + Main Play Button
+          CENTER HERO: Mascot Character + 3D Logo + Start Button
           ======================================================== */}
       <main className="lobby-hero-center">
+        {/* Mascot Character Illustration - Fully Integrated & Resized */}
+        <div className="lobby-mascot-pod">
+          <img
+            src={mascotGirlImg}
+            alt="Cheering Student Mascot"
+            className="lobby-mascot-img"
+          />
+        </div>
+
         {/* 3D Computer Quest Brand Logo */}
         <div className="brand-logo-pod">
           <div className="cap-stars-group">
             {/* 3D Graduation Cap */}
             <div className="grad-cap-box">
-              <svg width="68" height="52" viewBox="0 0 68 52" fill="none">
+              <svg width="56" height="42" viewBox="0 0 68 52" fill="none">
                 <polygon
                   points="34 4 66 18 34 32 2 18"
                   fill="#2c3e50"
@@ -173,15 +187,15 @@ export default function LobbyPage() {
           </div>
         </div>
 
-        {/* Big Emerald Green START ADVENTURE Button (Directly opens Game/Play screen) */}
+        {/* Big Emerald Green START ADVENTURE Button */}
         <button
           className="btn-start-adventure-hero"
           onClick={handleStartAdventure}
         >
           <svg
             className="play-triangle-svg"
-            width="24"
-            height="24"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
             fill="#ffffff"
           >
@@ -202,7 +216,7 @@ export default function LobbyPage() {
           onClick={() => navigate("/map")}
         >
           <div className="tile-icon-box">
-            <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
               <path
                 d="M6 10L18 6L30 10L42 6V38L30 42L18 38L6 42V10Z"
                 fill="#ffffff"
@@ -248,7 +262,7 @@ export default function LobbyPage() {
           onClick={() => navigate("/leaderboard")}
         >
           <div className="tile-icon-box">
-            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
               <circle cx="24" cy="24" r="16" fill="rgba(255,255,255,0.18)" />
               <path
                 d="M16 12H32V24C32 28.4 28.4 32 24 32C19.6 32 16 28.4 16 24V12Z"
@@ -292,7 +306,7 @@ export default function LobbyPage() {
           onClick={() => setShowSettings(true)}
         >
           <div className="tile-icon-box">
-            <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
               <circle
                 cx="24"
                 cy="24"

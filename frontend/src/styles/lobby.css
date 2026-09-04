@@ -1,8 +1,9 @@
 /* =========================================================
-   GAME LOBBY SCREEN - UNIFIED GAME SCENE (ZERO CUTOUTS)
-   Single Viewport on Mobile, Tablet, Laptop, and Desktop
-   (Zero Scrollbars, No Clipping, No Duplicates, Fluid Scaling)
+   GAME LOBBY SCREEN - 100% SINGLE VIEWPORT FIT
+   (Zero Scrollbars, No Clipping, Visible Mascot, Responsive Fluid Layout)
    ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800;900&family=Nunito:wght@700;800;900&display=swap');
 
 .lobby-game-viewport {
   width: 100vw;
@@ -12,16 +13,50 @@
   max-height: 100dvh;
   overflow: hidden;
   position: relative;
-  /* One Unified Clean Illustrated Game Background Scene */
-  background: #f7f9fd url('../assets/images/lobby_game_environment.jpg') center bottom / cover no-repeat;
+  /* Clean, vibrant pastel sky & classroom background */
+  background: linear-gradient(180deg, #dcf0fb 0%, #edf5fc 45%, #f4e9fc 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(10px, 2vh, 24px) clamp(12px, 3vw, 34px) clamp(8px, 1.8vh, 22px);
+  padding: clamp(8px, 1.6vh, 20px) clamp(10px, 2.5vw, 28px) clamp(8px, 1.6vh, 20px);
   box-sizing: border-box;
   user-select: none;
-  font-family: 'Fredoka', 'Nunito', 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+}
+
+/* Ambient Floating Decorative Elements */
+.lobby-ambient-bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.45;
+  filter: blur(2px);
+  z-index: 1;
+}
+
+.bubble-1 {
+  width: clamp(100px, 20vw, 240px);
+  height: clamp(100px, 20vw, 240px);
+  top: -40px;
+  right: -30px;
+  background: radial-gradient(circle, rgba(255, 234, 167, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.bubble-2 {
+  width: clamp(140px, 25vw, 300px);
+  height: clamp(140px, 25vw, 300px);
+  bottom: 10%;
+  left: -60px;
+  background: radial-gradient(circle, rgba(162, 155, 254, 0.5) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+.bubble-3 {
+  width: clamp(80px, 15vw, 180px);
+  height: clamp(80px, 15vw, 180px);
+  top: 35%;
+  right: -20px;
+  background: radial-gradient(circle, rgba(129, 236, 236, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
 }
 
 /* =========================================================
@@ -29,32 +64,32 @@
    ========================================================= */
 .lobby-top-bar {
   width: 100%;
+  max-width: 900px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   position: relative;
   z-index: 10;
   flex-shrink: 0;
 }
 
-/* Profile Card (Top Left) */
+/* Profile Card */
 .lobby-profile-card {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(8px);
-  border-radius: clamp(14px, 2vh, 20px);
-  padding: clamp(4px, 0.8vh, 8px) clamp(10px, 1.5vw, 18px) clamp(4px, 0.8vh, 8px) clamp(6px, 1vw, 10px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: clamp(12px, 2vh, 18px);
+  padding: clamp(3px, 0.6vh, 6px) clamp(8px, 1.2vw, 14px) clamp(3px, 0.6vh, 6px) clamp(5px, 0.8vw, 8px);
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1.2vw, 12px);
-  box-shadow: 0 8px 20px rgba(45, 55, 105, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
-  border: 1.5px solid rgba(255, 255, 255, 0.95);
-  transition: transform 0.18s ease;
-  max-width: calc(100vw - 80px);
+  gap: clamp(6px, 1vw, 10px);
+  box-shadow: 0 4px 14px rgba(45, 55, 105, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  max-width: calc(100vw - 70px);
 }
 
 .avatar-circle {
-  width: clamp(34px, 4.8vh, 46px);
-  height: clamp(34px, 4.8vh, 46px);
+  width: clamp(32px, 4.4vh, 42px);
+  height: clamp(32px, 4.4vh, 42px);
   border-radius: 50%;
   overflow: hidden;
   background: #ffeaa7;
@@ -62,7 +97,7 @@
   align-items: center;
   justify-content: center;
   border: 2px solid #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
 
@@ -80,11 +115,11 @@
 }
 
 .profile-username {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: clamp(0.85rem, 1.7vh, 1.05rem);
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.8rem, 1.5vh, 1rem);
   font-weight: 800;
   color: #1c2038;
-  line-height: 1.2;
+  line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -92,91 +127,77 @@
 
 .profile-meta-sub {
   font-family: 'Nunito', sans-serif;
-  font-size: clamp(0.66rem, 1.2vh, 0.74rem);
-  font-weight: 700;
-  color: #8395a7;
+  font-size: clamp(0.62rem, 1.1vh, 0.72rem);
+  font-weight: 800;
+  color: #747d8c;
   letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* XP Progress Bar Row */
 .profile-xp-row {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.8vw, 6px);
-  margin-top: 2px;
+  gap: clamp(3px, 0.6vw, 6px);
+  margin-top: 1px;
 }
 
 .xp-star-icon {
-  font-size: clamp(0.75rem, 1.4vh, 0.85rem);
+  font-size: clamp(0.68rem, 1.2vh, 0.8rem);
   line-height: 1;
 }
 
 .xp-level-label {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: clamp(0.68rem, 1.2vh, 0.76rem);
-  font-weight: 700;
-  color: #57606f;
-  white-space: nowrap;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.62rem, 1.1vh, 0.72rem);
+  font-weight: 800;
+  color: #f39c12;
 }
 
 .xp-progress-track {
-  width: clamp(48px, 8vw, 78px);
-  height: clamp(5px, 0.8vh, 7px);
+  width: clamp(40px, 8vw, 70px);
+  height: clamp(4px, 0.7vh, 6px);
   background: #e2e8f0;
-  border-radius: 10px;
+  border-radius: 999px;
   overflow: hidden;
-  position: relative;
-  flex-shrink: 0;
 }
 
 .xp-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ffc048 0%, #ffa801 100%);
-  border-radius: 10px;
-  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(90deg, #f1c40f, #f39c12);
+  border-radius: 999px;
+  transition: width 0.4s ease;
 }
 
 .xp-counter-text {
   font-family: 'Nunito', sans-serif;
-  font-size: clamp(0.66rem, 1.2vh, 0.74rem);
+  font-size: clamp(0.58rem, 1vh, 0.66rem);
   font-weight: 800;
-  color: #2f3542;
-  white-space: nowrap;
+  color: #a4b0be;
 }
 
-/* Header Actions (Logout Button) */
-.lobby-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
+/* Logout Button */
 .btn-lobby-logout {
-  width: clamp(38px, 5vh, 48px);
-  height: clamp(38px, 5vh, 48px);
-  border-radius: clamp(12px, 1.8vh, 16px);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(226, 232, 248, 0.95);
-  color: #2f3542;
+  width: clamp(36px, 4.8vh, 44px);
+  height: clamp(36px, 4.8vh, 44px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  color: #576574;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(45, 55, 105, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: all 0.16s ease;
-  outline: none;
+  flex-shrink: 0;
 }
 
 .btn-lobby-logout:hover {
+  background: #ff4757;
+  color: #ffffff;
   transform: scale(1.05);
-  background: #ffffff;
-  color: #eb4d4b;
-  border-color: #ffd2d2;
 }
 
 .btn-lobby-logout:active {
@@ -184,281 +205,330 @@
 }
 
 /* =========================================================
-   2. CENTER HERO AREA (Logo, Tagline, Big Play Button)
+   2. CENTER HERO: Mascot + 3D Logo + Main Play Button
    ========================================================= */
-.center-adventure-hero {
+.lobby-hero-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: clamp(6px, 1.3vh, 16px);
   position: relative;
   z-index: 10;
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
   margin: auto 0;
-  transform: translateY(clamp(-10px, -1.8vh, 0px));
-  flex-shrink: 0;
 }
 
-/* 3D Bubble Logo Group */
-.bubble-logo-container {
+/* Mascot Pod (Girl Cheering at Laptop) */
+.lobby-mascot-pod {
+  width: clamp(100px, 18vh, 155px);
+  height: clamp(100px, 18vh, 155px);
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle, #ffffff 40%, rgba(255, 255, 255, 0.6) 80%, rgba(255, 255, 255, 0) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(45, 55, 105, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: floatMascot 4s ease-in-out infinite;
+}
+
+@keyframes floatMascot {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.lobby-mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+/* Brand Logo Pod */
+.brand-logo-pod {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  cursor: default;
 }
 
-/* Graduation Cap & 3 Golden Stars Overhead */
-.logo-top-decorations {
+.cap-stars-group {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
-  margin-bottom: clamp(-8px, -1vh, -4px);
-  z-index: 5;
+  margin-bottom: clamp(-4px, -0.8vh, -8px);
+  z-index: 2;
 }
 
 .grad-cap-box {
-  transform: scale(clamp(0.65, 1vh, 1)) rotate(-10deg) translateY(-2px) translateX(-32px);
-  filter: drop-shadow(0 6px 14px rgba(27, 20, 100, 0.3));
+  transform: rotate(-10deg) scale(clamp(0.7, 0.95vh, 1));
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
 }
 
 .golden-stars-trio {
+  position: absolute;
+  right: -24px;
+  top: -6px;
   display: flex;
-  align-items: center;
-  gap: clamp(3px, 0.6vw, 6px);
-  margin-left: -16px;
-  margin-bottom: clamp(2px, 0.6vh, 8px);
-  transform: scale(clamp(0.7, 1vh, 1));
+  gap: 2px;
 }
 
 .star-trio {
-  font-size: clamp(0.9rem, 1.8vh, 1.15rem);
-  line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.45));
+  font-size: clamp(0.9rem, 1.8vh, 1.25rem);
+  filter: drop-shadow(0 2px 4px rgba(241, 196, 15, 0.4));
+  animation: starTwinkle 2.5s ease-in-out infinite;
 }
 
-.star-trio.star-center {
-  font-size: clamp(1.15rem, 2.4vh, 1.5rem);
-  transform: translateY(-3px);
+.star-center {
+  transform: translateY(-4px);
+  font-size: clamp(1.05rem, 2.1vh, 1.45rem);
 }
 
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* 3D Bubble Text Stack */
 .bubble-title-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
   line-height: 0.88;
-  position: relative;
-  z-index: 2;
 }
 
-/* 3D Bubble COMPUTER Text */
 .bubble-text-computer {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(1.6rem, 3.8vh, 2.6rem);
   font-weight: 900;
-  font-size: clamp(1.8rem, 5.2vh, 3.3rem);
-  letter-spacing: 0.03em;
+  letter-spacing: clamp(1px, 0.4vw, 2px);
   margin: 0;
-  line-height: 0.9;
-  background: linear-gradient(180deg, #ffffff 0%, #b3ecff 35%, #54a0ff 100%);
+  padding: 0;
+  background: linear-gradient(180deg, #70a1ff 0%, #1e90ff 48%, #0984e3 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 3px 0 #1b68cc) drop-shadow(0 6px 0 #183a88) drop-shadow(0 10px 14px rgba(24, 58, 136, 0.4));
+  filter: drop-shadow(0 2px 0 #0652dd)
+          drop-shadow(0 3px 0 #003e9c)
+          drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
-/* 3D Bubble QUEST Text */
 .bubble-text-quest {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(1.9rem, 4.4vh, 3.1rem);
   font-weight: 900;
-  font-size: clamp(2.2rem, 6.5vh, 4rem);
-  letter-spacing: 0.05em;
-  margin: -4px 0 0;
-  line-height: 0.88;
-  background: linear-gradient(180deg, #ffffff 0%, #fed330 35%, #f7b731 70%, #fa8231 100%);
+  letter-spacing: clamp(1.5px, 0.5vw, 3px);
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg, #fed330 0%, #ff9f1a 50%, #ee5253 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 3px 0 #d35400) drop-shadow(0 6px 0 #4a154b) drop-shadow(0 12px 16px rgba(74, 21, 75, 0.45));
+  filter: drop-shadow(0 2px 0 #d35400)
+          drop-shadow(0 3px 0 #b33939)
+          drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
-/* Learning Adventure Pill */
+/* Learning Adventure Capsule Pill */
 .learning-adventure-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: clamp(5px, 1vw, 8px);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(8px);
-  border-radius: 999px;
-  padding: clamp(3px, 0.6vh, 5px) clamp(12px, 2.5vw, 18px);
   margin-top: clamp(4px, 0.8vh, 8px);
-  box-shadow: 0 4px 14px rgba(45, 55, 105, 0.1);
-  border: 1px solid rgba(226, 232, 248, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  padding: clamp(2px, 0.4vh, 4px) clamp(10px, 1.8vw, 18px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .pill-dot-orange {
-  width: clamp(6px, 1vh, 8px);
-  height: clamp(6px, 1vh, 8px);
+  width: clamp(5px, 0.9vh, 7px);
+  height: clamp(5px, 0.9vh, 7px);
+  background: #ff793f;
   border-radius: 50%;
-  background: #ff6b4a;
-  flex-shrink: 0;
 }
 
 .pill-text-label {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: clamp(0.72rem, 1.3vh, 0.84rem);
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.6rem, 1.1vh, 0.74rem);
   font-weight: 800;
-  color: #27408b;
-  letter-spacing: 0.06em;
+  color: #2c3e50;
+  letter-spacing: 0.08em;
 }
 
-/* Big Green START ADVENTURE Button */
+/* Big Vibrant Emerald Green START ADVENTURE Button */
 .btn-start-adventure-hero {
-  width: clamp(260px, 78vw, 440px);
-  max-width: 88vw;
-  height: clamp(48px, 7.2vh, 68px);
-  border-radius: clamp(24px, 3.6vh, 34px);
-  background: linear-gradient(180deg, #4edb3b 0%, #34c721 55%, #2bb819 100%);
-  color: #ffffff;
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: clamp(1rem, 2.2vh, 1.35rem);
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  position: relative;
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 50%, #218c53 100%);
   border: none;
-  cursor: pointer;
-  box-shadow: 0 clamp(4px, 0.8vh, 7px) 0 #1b8a0e, 0 clamp(8px, 1.6vh, 16px) clamp(16px, 3.2vh, 32px) rgba(43, 184, 25, 0.4);
+  border-radius: clamp(14px, 2.2vh, 22px);
+  padding: clamp(8px, 1.6vh, 14px) clamp(22px, 4.5vw, 42px);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.6vw, 14px);
-  position: relative;
-  margin-top: clamp(10px, 2vh, 22px);
-  transition: all 0.16s ease;
-  outline: none;
+  gap: clamp(8px, 1.5vw, 12px);
+  cursor: pointer;
+  color: #ffffff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.95rem, 2vh, 1.25rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 clamp(4px, 0.8vh, 8px) 0 #1b6d41,
+              0 clamp(8px, 1.6vh, 16px) rgba(39, 174, 96, 0.35);
+  transition: all 0.14s ease;
+  overflow: hidden;
+  margin-top: clamp(2px, 0.5vh, 6px);
 }
 
 .btn-start-adventure-hero:hover {
-  background: linear-gradient(180deg, #59ea46 0%, #3cd628 55%, #32c41f 100%);
   transform: translateY(-2px);
-  box-shadow: 0 clamp(6px, 1vh, 9px) 0 #1b8a0e, 0 clamp(10px, 2vh, 20px) clamp(20px, 4vh, 38px) rgba(43, 184, 25, 0.46);
+  box-shadow: 0 clamp(6px, 1vh, 10px) 0 #1b6d41,
+              0 clamp(10px, 2vh, 20px) rgba(39, 174, 96, 0.45);
 }
 
 .btn-start-adventure-hero:active {
-  transform: translateY(3px);
-  box-shadow: 0 clamp(2px, 0.4vh, 3px) 0 #1b8a0e, 0 clamp(4px, 0.8vh, 8px) clamp(10px, 2vh, 18px) rgba(43, 184, 25, 0.35);
+  transform: translateY(clamp(3px, 0.6vh, 6px));
+  box-shadow: 0 1px 0 #1b6d41, 0 4px 8px rgba(39, 174, 96, 0.2);
 }
 
 .play-triangle-svg {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  width: clamp(16px, 2.2vh, 22px);
+  height: clamp(16px, 2.2vh, 22px);
 }
 
 .hero-btn-notch {
   position: absolute;
-  top: clamp(6px, 1vh, 9px);
-  right: clamp(14px, 2.5vw, 22px);
-  width: clamp(16px, 2.5vw, 22px);
-  height: clamp(8px, 1.2vh, 11px);
-  border-top: 2.5px solid rgba(255, 255, 255, 0.85);
-  border-right: 2.5px solid rgba(255, 255, 255, 0.85);
-  border-top-right-radius: 7px;
-  pointer-events: none;
+  top: 0;
+  right: 25px;
+  width: 28px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0 0 4px 4px;
 }
 
 /* =========================================================
-   3. BOTTOM ROW (3 Colorful Action Cards)
+   3. BOTTOM ROW (3 Action Tiles: View Map, Leaderboard, Settings)
    ========================================================= */
 .lobby-cards-row {
   width: 100%;
-  max-width: clamp(320px, 90vw, 820px);
+  max-width: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.8vw, 22px);
+  gap: clamp(8px, 1.8vw, 18px);
   position: relative;
   z-index: 10;
-  margin-bottom: 2px;
   flex-shrink: 0;
 }
 
+/* Bottom Action Tile */
 .bottom-action-tile {
   flex: 1;
-  height: clamp(56px, 8.8vh, 90px);
-  border-radius: clamp(14px, 2.2vh, 22px);
+  max-width: 170px;
+  border: none;
+  border-radius: clamp(12px, 1.8vh, 18px);
+  padding: clamp(6px, 1.2vh, 12px) clamp(6px, 1vw, 12px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(2px, 0.6vh, 6px);
-  color: #ffffff;
+  gap: clamp(3px, 0.6vh, 6px);
   cursor: pointer;
-  border: none;
-  outline: none;
-  transition: all 0.16s ease;
-  position: relative;
+  color: #ffffff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.72rem, 1.4vh, 0.88rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  transition: all 0.14s ease;
+  min-height: clamp(52px, 8.5vh, 76px);
 }
 
 .tile-icon-box {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(24px, 3.8vh, 36px);
 }
 
-.tile-title-text {
-  font-family: 'Fredoka', 'Nunito', sans-serif;
-  font-size: clamp(0.72rem, 1.4vh, 0.92rem);
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
+.tile-icon-box svg {
+  width: clamp(22px, 3.5vh, 32px);
+  height: clamp(22px, 3.5vh, 32px);
 }
 
-/* Card 1: View Map (Sky Blue) */
+/* 1. Sky Blue - View Map */
 .tile-blue {
-  background: linear-gradient(180deg, #3db3ff 0%, #0984e3 100%);
-  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #0762a8, 0 clamp(8px, 1.5vh, 14px) clamp(16px, 3vh, 26px) rgba(9, 132, 227, 0.38);
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #0369a1,
+              0 clamp(6px, 1.2vh, 12px) rgba(2, 132, 199, 0.28);
 }
 
 .tile-blue:hover {
-  background: linear-gradient(180deg, #52bdff 0%, #1a8ff0 100%);
   transform: translateY(-2px);
-  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #0762a8, 0 clamp(10px, 2vh, 18px) clamp(20px, 3.5vh, 32px) rgba(9, 132, 227, 0.44);
+  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #0369a1,
+              0 clamp(8px, 1.5vh, 15px) rgba(2, 132, 199, 0.38);
 }
 
 .tile-blue:active {
-  transform: translateY(3px);
-  box-shadow: 0 clamp(2px, 0.3vh, 3px) 0 #0762a8, 0 clamp(4px, 0.6vh, 6px) clamp(8px, 1.5vh, 14px) rgba(9, 132, 227, 0.3);
+  transform: translateY(clamp(2px, 0.5vh, 4px));
+  box-shadow: 0 1px 0 #0369a1;
 }
 
-/* Card 2: Leaderboard (Purple) */
+/* 2. Royal Purple - Leaderboard */
 .tile-purple {
-  background: linear-gradient(180deg, #a55eea 0%, #8854d0 100%);
-  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #5f27cd, 0 clamp(8px, 1.5vh, 14px) clamp(16px, 3vh, 26px) rgba(136, 84, 208, 0.38);
+  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
+  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #6d28d9,
+              0 clamp(6px, 1.2vh, 12px) rgba(124, 58, 237, 0.28);
 }
 
 .tile-purple:hover {
-  background: linear-gradient(180deg, #b373ee 0%, #9561db 100%);
   transform: translateY(-2px);
-  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #5f27cd, 0 clamp(10px, 2vh, 18px) clamp(20px, 3.5vh, 32px) rgba(136, 84, 208, 0.44);
+  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #6d28d9,
+              0 clamp(8px, 1.5vh, 15px) rgba(124, 58, 237, 0.38);
 }
 
 .tile-purple:active {
-  transform: translateY(3px);
-  box-shadow: 0 clamp(2px, 0.3vh, 3px) 0 #5f27cd, 0 clamp(4px, 0.6vh, 6px) clamp(8px, 1.5vh, 14px) rgba(136, 84, 208, 0.3);
+  transform: translateY(clamp(2px, 0.5vh, 4px));
+  box-shadow: 0 1px 0 #6d28d9;
 }
 
-/* Card 3: Settings (Warm Amber/Orange) */
+/* 3. Warm Amber - Settings */
 .tile-orange {
-  background: linear-gradient(180deg, #ffa801 0%, #ff793f 100%);
-  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #d35400, 0 clamp(8px, 1.5vh, 14px) clamp(16px, 3vh, 26px) rgba(255, 121, 63, 0.38);
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #b45309,
+              0 clamp(6px, 1.2vh, 12px) rgba(217, 119, 6, 0.28);
 }
 
 .tile-orange:hover {
-  background: linear-gradient(180deg, #ffb31a 0%, #ff8954 100%);
   transform: translateY(-2px);
-  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #d35400, 0 clamp(10px, 2vh, 18px) clamp(20px, 3.5vh, 32px) rgba(255, 121, 63, 0.44);
+  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #b45309,
+              0 clamp(8px, 1.5vh, 15px) rgba(217, 119, 6, 0.38);
 }
 
 .tile-orange:active {
-  transform: translateY(3px);
-  box-shadow: 0 clamp(2px, 0.3vh, 3px) 0 #d35400, 0 clamp(4px, 0.6vh, 6px) clamp(8px, 1.5vh, 14px) rgba(255, 121, 63, 0.3);
+  transform: translateY(clamp(2px, 0.5vh, 4px));
+  box-shadow: 0 1px 0 #b45309;
+}
+
+.tile-title-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   RESPONSIVE DEVICE ADJUSTMENTS (Desktop & Wide Screens)
+   ========================================================= */
+@media (min-width: 768px) {
+  .lobby-hero-center {
+    flex-direction: column;
+    gap: clamp(10px, 2vh, 20px);
+  }
 }

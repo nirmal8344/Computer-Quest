@@ -102,8 +102,22 @@ export default function MapPage() {
       return unitsData;
     } else if (mapStage === "CHAPTERS") {
       if (!selectedUnit) return chaptersData;
-      const uName = selectedUnit.unitName || `Unit ${selectedUnit.unitNumber}`;
-      return chaptersData.filter((ch) => ch.unit === uName || ch.unit === selectedUnit.unitName);
+      const uName = (selectedUnit.unitName || "").toLowerCase().trim();
+      const uNumPrefix = `unit ${selectedUnit.unitNumber}`.toLowerCase();
+      const romanNums = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
+      const uNumRomanPrefix = `unit ${romanNums[(selectedUnit.unitNumber || 1) - 1] || selectedUnit.unitNumber}`.toLowerCase();
+
+      const filtered = chaptersData.filter((ch) => {
+        if (!ch.unit) return false;
+        const chUnit = ch.unit.toLowerCase().trim();
+        return (
+          chUnit === uName ||
+          chUnit.startsWith(uNumPrefix) ||
+          chUnit.startsWith(uNumRomanPrefix) ||
+          ch.unit === selectedUnit.unitName
+        );
+      });
+      return filtered.length > 0 ? filtered : chaptersData;
     } else if (mapStage === "MISSIONS") {
       if (!selectedChapter) return missionsData;
       return missionsData.filter((m) => m.chapter?.id === selectedChapter.id);

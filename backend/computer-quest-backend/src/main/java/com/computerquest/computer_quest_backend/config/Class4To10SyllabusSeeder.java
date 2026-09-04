@@ -69,13 +69,37 @@ public class Class4To10SyllabusSeeder {
         }
     }
 
+    private void cleanupOrphans(School school, String board, int classLevel, int maxUnitNum, int maxChNum) {
+        if (school == null) return;
+        List<Unit> units = unitRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel);
+        for (Unit u : units) {
+            if (u.getUnitNumber() > maxUnitNum) {
+                unitRepository.delete(u);
+            }
+        }
+        List<Chapter> chapters = chapterRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel);
+        for (Chapter ch : chapters) {
+            if (ch.getChapterNumber() != null && ch.getChapterNumber() > maxChNum) {
+                List<Mission> missions = missionRepository.findByChapter_Id(ch.getId());
+                for (Mission m : missions) {
+                    missionRepository.delete(m);
+                }
+                chapterRepository.delete(ch);
+            }
+        }
+    }
+
     private Unit getOrCreateUnit(School school, String board, int classLevel, int unitNumber, String unitName) {
         List<Unit> units = (school != null)
                 ? unitRepository.findBySchool_IdAndBoardAndClassLevel(school.getId(), board, classLevel)
                 : unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
 
         for (Unit u : units) {
-            if (u.getUnitNumber() == unitNumber || u.getUnitName().equalsIgnoreCase(unitName)) {
+            if (u.getUnitNumber() == unitNumber) {
+                if (!u.getUnitName().equalsIgnoreCase(unitName)) {
+                    u.setUnitName(unitName);
+                    return unitRepository.save(u);
+                }
                 return u;
             }
         }
@@ -99,10 +123,19 @@ public class Class4To10SyllabusSeeder {
             ch.setClassLevel(classLevel);
             if (school != null) ch.setSchool(school);
             ch = chapterRepository.save(ch);
-        } else if (ch.getUnit() == null || !ch.getUnit().equalsIgnoreCase(unitName) || !ch.getChapterName().equalsIgnoreCase(chName)) {
-            ch.setUnit(unitName);
-            ch.setChapterName(chName);
-            ch = chapterRepository.save(ch);
+        } else {
+            boolean changed = false;
+            if (ch.getUnit() == null || !ch.getUnit().equalsIgnoreCase(unitName)) {
+                ch.setUnit(unitName);
+                changed = true;
+            }
+            if (ch.getChapterName() == null || !ch.getChapterName().equalsIgnoreCase(chName)) {
+                ch.setChapterName(chName);
+                changed = true;
+            }
+            if (changed) {
+                ch = chapterRepository.save(ch);
+            }
         }
 
         for (int m = 1; m <= 4; m++) {
@@ -161,6 +194,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass4(School school) {
         String board = "CBSE";
         int classLevel = 4;
+        cleanupOrphans(school, board, classLevel, 3, 6);
 
         // --- Unit 1 – Computer Hardware & System Architecture ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Computer Hardware & System Architecture");
@@ -314,6 +348,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass5(School school) {
         String board = "CBSE";
         int classLevel = 5;
+        cleanupOrphans(school, board, classLevel, 3, 6);
 
         // --- Unit 1 – Advanced Computing Systems & Generations ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Advanced Computing Systems & Generations");
@@ -467,6 +502,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass6(School school) {
         String board = "CBSE";
         int classLevel = 6;
+        cleanupOrphans(school, board, classLevel, 3, 6);
 
         // --- Unit 1 – Number Systems & Data Foundations ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Number Systems & Data Foundations");
@@ -617,6 +653,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass7(School school) {
         String board = "CBSE";
         int classLevel = 7;
+        cleanupOrphans(school, board, classLevel, 3, 6);
 
         // --- Unit 1 – Advanced Data Management & Networks ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Advanced Data Management & Networks");
@@ -766,6 +803,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass8(School school) {
         String board = "CBSE";
         int classLevel = 8;
+        cleanupOrphans(school, board, classLevel, 3, 6);
 
         // --- Unit 1 – Advanced Web Development & CSS ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Advanced Web Development & CSS");
@@ -913,6 +951,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass9(School school) {
         String board = "CBSE";
         int classLevel = 9;
+        cleanupOrphans(school, board, classLevel, 4, 7);
 
         // --- Unit 1 – Basics of Information Technology ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Basics of Information Technology");
@@ -1084,6 +1123,7 @@ public class Class4To10SyllabusSeeder {
     private void seedCbseClass10(School school) {
         String board = "CBSE";
         int classLevel = 10;
+        cleanupOrphans(school, board, classLevel, 5, 5);
 
         // --- Unit 1 – Networking, Web Technologies & Cyber Safety ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Networking, Web Technologies & Cyber Safety");
@@ -1213,6 +1253,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass4(School school) {
         String board = "STATE_BOARD";
         int classLevel = 4;
+        cleanupOrphans(school, board, classLevel, 3, 3);
 
         // --- Unit 1 – Term 1: Computer Hardware & Peripherals ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Term 1: Computer Hardware & Peripherals");
@@ -1294,6 +1335,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass5(School school) {
         String board = "STATE_BOARD";
         int classLevel = 5;
+        cleanupOrphans(school, board, classLevel, 3, 3);
 
         // --- Unit 1 – Term 1: Desktop Environment & File Management ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Term 1: Desktop Environment & File Management");
@@ -1375,6 +1417,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass6(School school) {
         String board = "STATE_BOARD";
         int classLevel = 6;
+        cleanupOrphans(school, board, classLevel, 3, 3);
 
         // --- Unit 1 – Term 1: Evolution of Computers & Generations ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Term 1: Evolution of Computers & Generations");
@@ -1456,6 +1499,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass7(School school) {
         String board = "STATE_BOARD";
         int classLevel = 7;
+        cleanupOrphans(school, board, classLevel, 3, 3);
 
         // --- Unit 1 – Term 1: Spreadsheet Analysis with LibreOffice Calc ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Term 1: Spreadsheet Analysis with LibreOffice Calc");
@@ -1537,6 +1581,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass8(School school) {
         String board = "STATE_BOARD";
         int classLevel = 8;
+        cleanupOrphans(school, board, classLevel, 3, 3);
 
         // --- Unit 1 – Term 1: HTML Lists, Tables & Form Design ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Term 1: HTML Lists, Tables & Form Design");
@@ -1618,6 +1663,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass9(School school) {
         String board = "STATE_BOARD";
         int classLevel = 9;
+        cleanupOrphans(school, board, classLevel, 4, 4);
 
         // --- Unit 1 – Computer Systems & BOSS Linux Administration ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Computer Systems & BOSS Linux Administration");
@@ -1723,6 +1769,7 @@ public class Class4To10SyllabusSeeder {
     private void seedStateBoardClass10(School school) {
         String board = "STATE_BOARD";
         int classLevel = 10;
+        cleanupOrphans(school, board, classLevel, 5, 5);
 
         // --- Unit 1 – Computer Networks, Topologies & Cyber Laws ---
         getOrCreateUnit(school, board, classLevel, 1, "Unit 1 – Computer Networks, Topologies & Cyber Laws");
