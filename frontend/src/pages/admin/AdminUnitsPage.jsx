@@ -18,7 +18,10 @@ export default function AdminUnitsPage() {
   const fetchUnits = () => {
     adminApi
       .getUnits({ adminId: adminUser?.id })
-      .then((data) => setUnits(data))
+      .then((data) => {
+        const sorted = (data || []).sort((a, b) => (a.unitNumber || 0) - (b.unitNumber || 0));
+        setUnits(sorted);
+      })
       .catch((err) => setError(err.message));
   };
 

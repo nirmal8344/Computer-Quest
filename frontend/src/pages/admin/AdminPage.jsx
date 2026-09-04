@@ -74,7 +74,19 @@ export default function AdminPage() {
       const admin = getAdminContext();
       const params = admin ? { adminId: admin.id } : {};
       const res = await classApi.getClasses(params);
-      setClasses(res || []);
+      const list = res || [];
+      // Deduplicate by classLevel and sort ascending (4th -> 12th)
+      const seen = new Set();
+      const distinct = [];
+      for (const cls of list) {
+        const lvl = cls.classLevel || parseInt((cls.className || "").replace(/\D+/g, ""), 10) || 0;
+        if (!seen.has(lvl)) {
+          seen.add(lvl);
+          distinct.push({ ...cls, classLevel: lvl });
+        }
+      }
+      distinct.sort((a, b) => a.classLevel - b.classLevel);
+      setClasses(distinct);
     } catch (err) {
       setError(err.message || "Failed to load classes");
     } finally {
@@ -94,7 +106,18 @@ export default function AdminPage() {
         ...(admin?.id ? { adminId: admin.id } : {}),
       };
       const res = await unitApi.getUnits(params);
-      setUnits(res || []);
+      const list = res || [];
+      const distinctUnits = [];
+      const seenUnits = new Set();
+      for (const u of list) {
+        const uNum = u.unitNumber || 0;
+        if (!seenUnits.has(uNum)) {
+          seenUnits.add(uNum);
+          distinctUnits.push(u);
+        }
+      }
+      distinctUnits.sort((a, b) => (a.unitNumber || 0) - (b.unitNumber || 0));
+      setUnits(distinctUnits);
     } catch (err) {
       setError(err.message || "Failed to load units");
     } finally {
@@ -114,10 +137,32 @@ export default function AdminPage() {
         ...(admin?.id ? { adminId: admin.id } : {}),
       };
       const allChapters = await chapterApi.getAll(params);
+      const uName = (unitObj.unitName || "").toLowerCase().trim();
+      const uNumPrefix = `unit ${unitObj.unitNumber}`.toLowerCase();
+      const romanNums = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
+      const uNumRomanPrefix = `unit ${romanNums[(unitObj.unitNumber || 1) - 1] || unitObj.unitNumber}`.toLowerCase();
+
       const filtered = (allChapters || []).filter(
-        (c) => c.unit === unitObj.unitName || String(c.unit) === String(unitObj.unitNumber)
+        (c) =>
+          c.unit === unitObj.unitName ||
+          (c.unit && (
+            c.unit.toLowerCase().trim() === uName ||
+            c.unit.toLowerCase().startsWith(uNumPrefix) ||
+            c.unit.toLowerCase().startsWith(uNumRomanPrefix)
+          ))
       );
-      setChapters(filtered.length > 0 ? filtered : allChapters);
+      const targetList = filtered.length > 0 ? filtered : allChapters;
+      const seenCh = new Set();
+      const distinctCh = [];
+      for (const ch of targetList) {
+        const chNum = ch.chapterNumber || 0;
+        if (!seenCh.has(chNum)) {
+          seenCh.add(chNum);
+          distinctCh.push(ch);
+        }
+      }
+      distinctCh.sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+      setChapters(distinctCh);
     } catch (err) {
       setError(err.message || "Failed to load chapters");
     } finally {

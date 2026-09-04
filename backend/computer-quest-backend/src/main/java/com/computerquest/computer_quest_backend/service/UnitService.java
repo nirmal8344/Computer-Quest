@@ -10,6 +10,7 @@ import com.computerquest.computer_quest_backend.repository.UnitRepository;
 import com.computerquest.computer_quest_backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -76,33 +77,46 @@ public class UnitService {
             }
         }
 
+        List<Unit> rawResult = new ArrayList<>();
         if (schoolId != null) {
             if (board != null && classLevel != null) {
                 List<Unit> schoolUnits = unitRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
                 if (!schoolUnits.isEmpty()) {
-                    return schoolUnits;
+                    rawResult = schoolUnits;
                 }
             } else {
                 List<Unit> schoolUnits = unitRepository.findBySchool_Id(schoolId);
                 if (!schoolUnits.isEmpty()) {
-                    return schoolUnits;
+                    rawResult = schoolUnits;
                 }
             }
-            // Fallback to global seeded content if no school specific content
-            if (board != null && classLevel != null) {
-                return unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+            if (rawResult.isEmpty()) {
+                if (board != null && classLevel != null) {
+                    rawResult = unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                } else {
+                    rawResult = unitRepository.findBySchoolIsNull();
+                }
             }
-            return unitRepository.findBySchoolIsNull();
-        }
-
-        if (board != null && classLevel != null) {
+        } else if (board != null && classLevel != null) {
             List<Unit> units = unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
             if (!units.isEmpty()) {
-                return units;
+                rawResult = units;
             }
         }
 
-        return unitRepository.findAll();
+        if (rawResult.isEmpty()) {
+            rawResult = unitRepository.findAll();
+        }
+
+        // Deduplicate and sort strictly in ascending order by unitNumber (1, 2, 3, 4, 5...)
+        java.util.Map<Integer, Unit> distinctMap = new java.util.LinkedHashMap<>();
+        for (Unit u : rawResult) {
+            int num = u.getUnitNumber() != null ? u.getUnitNumber() : 0;
+            distinctMap.putIfAbsent(num, u);
+        }
+        List<Unit> result = new ArrayList<>(distinctMap.values());
+        result.sort(java.util.Comparator.comparing(u -> u.getUnitNumber() != null ? u.getUnitNumber() : 0));
+        return result;
     }
 
     public Unit updateUnit(Long id, Unit unit) {

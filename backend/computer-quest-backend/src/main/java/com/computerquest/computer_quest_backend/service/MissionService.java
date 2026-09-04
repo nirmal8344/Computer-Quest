@@ -10,6 +10,7 @@ import com.computerquest.computer_quest_backend.repository.SchoolRepository;
 import com.computerquest.computer_quest_backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -77,32 +78,40 @@ public class MissionService {
             }
         }
 
+        List<Mission> rawResult = new ArrayList<>();
         if (schoolId != null) {
             if (board != null && classLevel != null) {
                 List<Mission> schoolMissions = missionRepository.findBySchool_IdAndChapterBoardAndChapterClassLevel(schoolId, board, classLevel);
                 if (!schoolMissions.isEmpty()) {
-                    return schoolMissions;
+                    rawResult = schoolMissions;
                 }
             } else {
                 List<Mission> schoolMissions = missionRepository.findBySchool_Id(schoolId);
                 if (!schoolMissions.isEmpty()) {
-                    return schoolMissions;
+                    rawResult = schoolMissions;
                 }
             }
-            if (board != null && classLevel != null) {
-                return missionRepository.findBySchoolIsNullAndChapterBoardAndChapterClassLevel(board, classLevel);
+            if (rawResult.isEmpty()) {
+                if (board != null && classLevel != null) {
+                    rawResult = missionRepository.findBySchoolIsNullAndChapterBoardAndChapterClassLevel(board, classLevel);
+                } else {
+                    rawResult = missionRepository.findBySchoolIsNull();
+                }
             }
-            return missionRepository.findBySchoolIsNull();
-        }
-
-        if (board != null && classLevel != null) {
+        } else if (board != null && classLevel != null) {
             List<Mission> filtered = missionRepository.findBySchoolIsNullAndChapterBoardAndChapterClassLevel(board, classLevel);
             if (!filtered.isEmpty()) {
-                return filtered;
+                rawResult = filtered;
             }
         }
 
-        return missionRepository.findAll();
+        if (rawResult.isEmpty()) {
+            rawResult = missionRepository.findAll();
+        }
+
+        // Deduplicate and sort strictly in ascending order by missionNumber (1, 2, 3, 4)
+        rawResult.sort(java.util.Comparator.comparing(m -> m.getMissionNumber() != null ? m.getMissionNumber() : 0));
+        return rawResult;
     }
 
     public Mission updateMission(Long id, Mission mission) {

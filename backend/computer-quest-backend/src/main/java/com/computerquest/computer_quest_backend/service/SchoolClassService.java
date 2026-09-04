@@ -86,20 +86,42 @@ public class SchoolClassService {
         if (schoolId != null) {
             classes = board != null ? schoolClassRepository.findBySchool_IdAndBoard(schoolId, board)
                     : schoolClassRepository.findBySchool_Id(schoolId);
-        } else {
+        }
+        if (classes.isEmpty()) {
             classes = board != null ? schoolClassRepository.findBySchoolIsNullAndBoard(board)
                     : schoolClassRepository.findBySchoolIsNull();
         }
-
-        // If database has no classes seeded yet, seed defaults (11th Standard & 12th Standard)
         if (classes.isEmpty()) {
-            SchoolClass c11 = saveClass(new SchoolClass("11th Standard", 11, board != null ? board : "CBSE"));
-            SchoolClass c12 = saveClass(new SchoolClass("12th Standard", 12, board != null ? board : "CBSE"));
-            classes.add(c11);
-            classes.add(c12);
+            classes = schoolClassRepository.findAll();
         }
 
-        return classes;
+        // Deduplicate and sort in exact ascending order by classLevel (4th -> 12th)
+        java.util.Map<Integer, SchoolClass> distinctMap = new java.util.LinkedHashMap<>();
+        for (SchoolClass sc : classes) {
+            int lvl = sc.getClassLevel() != null ? sc.getClassLevel() : 0;
+            if (lvl >= 4 && lvl <= 12) {
+                if (board != null) {
+                    distinctMap.put(lvl, sc);
+                } else {
+                    distinctMap.putIfAbsent(lvl, sc);
+                }
+            }
+        }
+
+        // Ensure all standards 4th through 12th exist in the list
+        for (int lvl = 4; lvl <= 12; lvl++) {
+            if (!distinctMap.containsKey(lvl)) {
+                SchoolClass newClass = new SchoolClass(lvl + "th Standard", lvl, board != null ? board : "CBSE");
+                try {
+                    newClass = schoolClassRepository.save(newClass);
+                } catch (Exception ignored) {}
+                distinctMap.put(lvl, newClass);
+            }
+        }
+
+        List<SchoolClass> result = new ArrayList<>(distinctMap.values());
+        result.sort(java.util.Comparator.comparing(c -> c.getClassLevel() != null ? c.getClassLevel() : 0));
+        return result;
     }
 
     public SchoolClass updateClass(Long id, SchoolClass updatedClass) {

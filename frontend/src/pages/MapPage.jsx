@@ -44,7 +44,8 @@ export default function MapPage() {
     ])
       .then(([u, c, m, g]) => {
         if (!active) return;
-        const sortedChapters = [...c].sort((a, b) => a.chapterNumber - b.chapterNumber);
+        const sortedChapters = [...(c || [])].sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+        const sortedMissions = [...(m || [])].sort((a, b) => (a.missionNumber || 0) - (b.missionNumber || 0));
 
         let parsedUnits = u;
         if (!parsedUnits || parsedUnits.length === 0) {
@@ -55,10 +56,11 @@ export default function MapPage() {
             unitNumber: idx + 1,
           }));
         }
+        const sortedUnits = [...(parsedUnits || [])].sort((a, b) => (a.unitNumber || 0) - (b.unitNumber || 0));
 
-        setUnitsData(parsedUnits);
+        setUnitsData(sortedUnits);
         setChaptersData(sortedChapters);
-        setMissionsData(m);
+        setMissionsData(sortedMissions);
         setGameData(g);
         setLoading(false);
       })

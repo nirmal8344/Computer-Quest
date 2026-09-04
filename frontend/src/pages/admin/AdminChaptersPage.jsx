@@ -20,7 +20,10 @@ export default function AdminChaptersPage() {
   const fetchChapters = () => {
     chapterApi
       .getAll({ adminId: adminUser?.id })
-      .then((data) => setChapters(data))
+      .then((data) => {
+        const sorted = (data || []).sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+        setChapters(sorted);
+      })
       .catch((err) => setError(err.message));
   };
 

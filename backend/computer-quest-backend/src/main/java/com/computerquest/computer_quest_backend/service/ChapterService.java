@@ -12,6 +12,7 @@ import com.computerquest.computer_quest_backend.repository.SchoolRepository;
 import com.computerquest.computer_quest_backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -99,43 +100,60 @@ public class ChapterService {
             }
         }
 
+        List<Chapter> rawResult = new ArrayList<>();
         if (schoolId != null) {
             if (board != null && classLevel != null) {
                 List<Chapter> schoolChapters = chapterRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
                 if (!schoolChapters.isEmpty()) {
-                    return schoolChapters;
+                    rawResult = schoolChapters;
                 }
             } else {
                 List<Chapter> schoolChapters = chapterRepository.findBySchool_Id(schoolId);
                 if (!schoolChapters.isEmpty()) {
-                    return schoolChapters;
+                    rawResult = schoolChapters;
                 }
             }
-            if (board != null && classLevel != null) {
-                List<Chapter> nullSchool = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
-                if (!nullSchool.isEmpty()) {
-                    return nullSchool;
+            if (rawResult.isEmpty()) {
+                if (board != null && classLevel != null) {
+                    List<Chapter> nullSchool = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                    if (!nullSchool.isEmpty()) {
+                        rawResult = nullSchool;
+                    } else {
+                        List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
+                        if (!anySchool.isEmpty()) {
+                            rawResult = anySchool;
+                        }
+                    }
                 }
-                List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
-                if (!anySchool.isEmpty()) {
-                    return anySchool;
+                if (rawResult.isEmpty()) {
+                    rawResult = chapterRepository.findBySchoolIsNull();
                 }
             }
-            return chapterRepository.findBySchoolIsNull();
-        }
-
-        if (board != null && classLevel != null) {
+        } else if (board != null && classLevel != null) {
             List<Chapter> filtered = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
             if (!filtered.isEmpty()) {
-                return filtered;
-            }
-            List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
-            if (!anySchool.isEmpty()) {
-                return anySchool;
+                rawResult = filtered;
+            } else {
+                List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
+                if (!anySchool.isEmpty()) {
+                    rawResult = anySchool;
+                }
             }
         }
 
-        return chapterRepository.findAll();
+        if (rawResult.isEmpty()) {
+            rawResult = chapterRepository.findAll();
+        }
+
+        // Deduplicate and sort strictly in ascending order by chapterNumber (1, 2, 3, 4, 5, 6...)
+        java.util.Map<Integer, Chapter> distinctMap = new java.util.LinkedHashMap<>();
+        for (Chapter ch : rawResult) {
+            int num = ch.getChapterNumber() != null ? ch.getChapterNumber() : 0;
+            distinctMap.putIfAbsent(num, ch);
+        }
+        List<Chapter> result = new ArrayList<>(distinctMap.values());
+        result.sort(java.util.Comparator.comparing(ch -> ch.getChapterNumber() != null ? ch.getChapterNumber() : 0));
+        return result;
     }
 
     public Chapter updateChapter(Long id, Chapter chapter) {
