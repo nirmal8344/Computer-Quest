@@ -177,6 +177,35 @@
   color: #a4b0be;
 }
 
+.lobby-header-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 10px);
+}
+
+.btn-lobby-github {
+  width: clamp(36px, 4.8vh, 44px);
+  height: clamp(36px, 4.8vh, 44px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.16s ease;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.btn-lobby-github:hover {
+  background: #0f172a;
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
 /* Logout Button */
 .btn-lobby-logout {
   width: clamp(36px, 4.8vh, 44px);
@@ -524,11 +553,60 @@
 }
 
 /* =========================================================
-   RESPONSIVE DEVICE ADJUSTMENTS (Desktop & Wide Screens)
+   RESPONSIVE DEVICE ADJUSTMENTS (Mobile, Tablet, Laptop, Desktop)
    ========================================================= */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
+  .lobby-hero-center {
+    max-width: 580px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
   .lobby-hero-center {
     flex-direction: column;
-    gap: clamp(10px, 2vh, 20px);
+    gap: clamp(8px, 1.8vh, 18px);
+  }
+}
+
+@media (max-width: 767px) {
+  .lobby-game-viewport {
+    padding: clamp(6px, 1.2vh, 14px) clamp(8px, 2vw, 16px) clamp(6px, 1.2vh, 14px);
+    overflow-y: auto;
+  }
+  .lobby-profile-card {
+    max-width: calc(100vw - 110px);
+  }
+  .lobby-hero-center {
+    gap: clamp(4px, 1vh, 10px);
+  }
+}
+
+@media (max-height: 650px) {
+  .lobby-game-viewport {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-height: none;
+    gap: 12px;
+  }
+  .lobby-mascot-pod {
+    width: clamp(70px, 14vh, 110px);
+    height: clamp(70px, 14vh, 110px);
+  }
+}
+
+@media (max-width: 380px) {
+  .profile-details-col {
+    max-width: 140px;
+  }
+  .bottom-action-tile {
+    padding: 6px 4px;
+    min-height: 48px;
+    font-size: 0.68rem;
+  }
+  .btn-start-adventure-hero {
+    padding: 8px 18px;
+    font-size: 0.88rem;
   }
 }

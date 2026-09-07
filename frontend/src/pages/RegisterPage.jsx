@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { SchoolIcon, LockIcon } from "../components/GameIcons.jsx";
+import { SchoolIcon, LockIcon, GitHubIcon } from "../components/GameIcons.jsx";
 import mascotImg from "../assets/images/pencil_girl_mascot.jpg";
 import "../styles/auth.css";
+
+const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
 
 export default function RegisterPage() {
   const { register, registerAdmin } = useAuth();
@@ -340,6 +342,17 @@ export default function RegisterPage() {
                   Log In
                 </Link>
               </span>
+
+              <a
+                href={GITHUB_REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-github-link"
+                title="View Source on GitHub"
+              >
+                <GitHubIcon size={16} />
+                <span>GitHub</span>
+              </a>
             </div>
           </div>
         </div>

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { GearIcon, CloseIcon } from "./GameIcons";
+import { GearIcon, CloseIcon, GitHubIcon } from "./GameIcons";
 import "../styles/settings.css";
+
+const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
 
 export default function SettingsModal({ onClose }) {
   const { user, logout } = useAuth();
@@ -68,6 +70,25 @@ export default function SettingsModal({ onClose }) {
               className="modern-volume-slider"
             />
           </div>
+        </div>
+
+        {/* GitHub Project Section */}
+        <div className="settings-github-box">
+          <div className="github-info-left">
+            <GitHubIcon size={20} className="github-icon-accent" />
+            <div className="github-text-col">
+              <span className="github-title">Computer Quest on GitHub</span>
+              <span className="github-sub">Open source educational quest</span>
+            </div>
+          </div>
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-github-link"
+          >
+            Star Repo ⭐
+          </a>
         </div>
 
         <div className="user-profile-badge-box">

@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { gameApi } from "../api/client";
 import SettingsModal from "../components/SettingsModal.jsx";
+import { GitHubIcon } from "../components/GameIcons.jsx";
 import studentAvatarImg from "../assets/images/student_avatar.jpg";
 import mascotGirlImg from "../assets/images/lobby_girl_mascot.jpg";
 import "../styles/lobby.css";
+
+const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
 
 export default function LobbyPage() {
   const { user, logout } = useAuth();
@@ -57,7 +60,7 @@ export default function LobbyPage() {
       <div className="lobby-ambient-bubble bubble-3" />
 
       {/* ========================================================
-          TOP BAR (Profile Card on Left + Logout on Right)
+          TOP BAR (Profile Card on Left + GitHub & Logout on Right)
           ======================================================== */}
       <header className="lobby-top-bar">
         {/* Profile Card with Real Dynamic Backend Data */}
@@ -86,8 +89,18 @@ export default function LobbyPage() {
           </div>
         </div>
 
-        {/* Top-Right Logout Button */}
+        {/* Top-Right Header Actions (GitHub + Logout) */}
         <div className="lobby-header-actions">
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-lobby-github"
+            title="View on GitHub"
+          >
+            <GitHubIcon size={20} />
+          </a>
+
           <button
             className="btn-lobby-logout"
             title="Sign Out"

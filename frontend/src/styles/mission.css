@@ -419,18 +419,62 @@
 
 @media (max-width: 600px) {
   .mission-modern-screen {
-    padding: 12px 14px 40px;
+    padding: 10px 12px 40px;
+  }
+  .lives-container {
+    padding: 4px 10px;
+    gap: 4px;
+  }
+  .lives-count-text {
+    font-size: 0.78rem;
   }
   .question-play-card {
-    padding: 20px 18px;
-    gap: 14px;
+    padding: 16px 14px;
+    gap: 12px;
+    border-radius: var(--radius-2xl);
   }
   .question-headline-text {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
+  }
+  .mcq-option-pill {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+  .option-content-text {
+    font-size: 0.9rem;
   }
   .feedback-banner-card {
     flex-direction: column;
     gap: 12px;
     text-align: center;
+    padding: 12px 14px;
+  }
+  .btn-next-question {
+    width: 100%;
+  }
+  .outcome-headline {
+    font-size: 1.5rem;
+  }
+  .outcome-stats-row {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .stat-pill-result {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 380px) {
+  .question-step-chip {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+  .option-letter-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 0.82rem;
   }
 }

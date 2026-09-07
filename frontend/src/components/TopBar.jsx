@@ -10,9 +10,12 @@ import {
   GearIcon,
   BackArrowIcon,
   MapIcon,
+  GitHubIcon,
 } from "./GameIcons";
 import GameLogo from "./GameLogo.jsx";
 import "../styles/topbar.css";
+
+const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
 
 export default function TopBar({ xp, lives, showNav = true }) {
   const { user } = useAuth();
@@ -71,6 +74,16 @@ export default function TopBar({ xp, lives, showNav = true }) {
         </div>
 
         <div className="game-topbar-right">
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topbar-circle-btn topbar-github-btn"
+            title="View on GitHub / Star Project"
+          >
+            <GitHubIcon size={19} />
+          </a>
+
           <button
             className="player-pill-btn"
             onClick={() => navigate("/profile")}
