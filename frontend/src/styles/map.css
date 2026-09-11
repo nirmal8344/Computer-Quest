@@ -38,6 +38,42 @@
   margin: 0 auto 6px;
 }
 
+.map-header-subject-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #4834d4;
+  border-radius: 999px;
+  padding: 6px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(72, 52, 212, 0.12);
+  transition: all 0.2s ease;
+}
+
+.map-header-subject-badge:hover {
+  transform: translateY(-1px);
+  background: #f0f3ff;
+  box-shadow: 0 6px 16px rgba(72, 52, 212, 0.22);
+}
+
+.badge-sub-icon {
+  font-size: 1.1rem;
+}
+
+.badge-sub-title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #4834d4;
+}
+
+.badge-sub-switch {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #6852d6;
+}
+
 .map-header-center-pill {
   display: flex;
   align-items: center;

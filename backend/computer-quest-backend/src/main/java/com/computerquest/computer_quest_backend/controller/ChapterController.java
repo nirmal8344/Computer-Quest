@@ -26,11 +26,12 @@ public class ChapterController {
     public List<Chapter> getAllChapters(
             @RequestParam(required = false) String board,
             @RequestParam(required = false) Integer classLevel,
+            @RequestParam(required = false) String subject,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long adminId,
             @RequestParam(required = false) Long schoolId) {
 
-        return chapterService.getChapters(board, classLevel, userId, adminId, schoolId);
+        return chapterService.getChapters(board, classLevel, subject, userId, adminId, schoolId);
     }
 
     @PutMapping("/{id}")
@@ -42,9 +43,9 @@ public class ChapterController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteChapter(@PathVariable Long id) {
+    public String deleteChapter(@PathVariable Long id, @RequestParam(required = false) Long adminId) {
 
-        chapterService.deleteChapter(id);
+        chapterService.deleteChapter(id, adminId);
 
         return "Chapter deleted successfully";
     }

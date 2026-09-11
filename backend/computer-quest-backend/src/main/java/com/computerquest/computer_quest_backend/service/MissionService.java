@@ -115,21 +115,42 @@ public class MissionService {
     }
 
     public Mission updateMission(Long id, Mission mission) {
-
-        Mission existingMission = missionRepository
+        Mission existing = missionRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Mission not found"));
 
-        mission.setId(existingMission.getId());
+        if (mission.getAdminId() != null) {
+            Admin admin = adminRepository.findById(mission.getAdminId()).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot modify mission of another school.");
+                }
+            }
+        }
 
+        mission.setId(existing.getId());
+        resolveSchool(mission);
         return missionRepository.save(mission);
     }
 
     public void deleteMission(Long id) {
+        deleteMission(id, null);
+    }
 
-        if (!missionRepository.existsById(id)) {
-            throw new RuntimeException("Mission not found");
+    public void deleteMission(Long id, Long adminId) {
+        Mission existing = missionRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Mission not found"));
+
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot delete mission of another school.");
+                }
+            }
         }
 
         missionRepository.deleteById(id);

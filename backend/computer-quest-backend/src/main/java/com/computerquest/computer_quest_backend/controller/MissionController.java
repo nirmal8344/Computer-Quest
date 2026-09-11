@@ -42,9 +42,9 @@ public class MissionController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteMission(@PathVariable Long id) {
+    public String deleteMission(@PathVariable Long id, @RequestParam(required = false) Long adminId) {
 
-        missionService.deleteMission(id);
+        missionService.deleteMission(id, adminId);
 
         return "Mission deleted successfully";
     }

@@ -1,11 +1,99 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { SchoolIcon, LockIcon, GitHubIcon } from "../components/GameIcons.jsx";
+import { SchoolIcon, LockIcon } from "../components/GameIcons.jsx";
 import mascotImg from "../assets/images/pencil_girl_mascot.jpg";
 import "../styles/auth.css";
 
-const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
+export const TN_STATE_BOARD_GROUPS = [
+  {
+    id: "GROUP 1 – MATHS-BIOLOGY / BIO-MATHS",
+    title: "Group 1 – Maths-Biology / Bio-Maths",
+    badge: "Bio-Maths",
+    subjects: ["Tamil", "English", "Physics", "Chemistry", "Mathematics", "Biology"]
+  },
+  {
+    id: "GROUP 2 – MATHS + COMPUTER SCIENCE",
+    title: "Group 2 – Maths + Computer Science",
+    badge: "Maths + CS",
+    subjects: ["Tamil", "English", "Physics", "Chemistry", "Mathematics", "Computer Science"]
+  },
+  {
+    id: "GROUP 3 – PURE SCIENCE / BIOLOGY",
+    title: "Group 3 – Pure Science / Biology",
+    badge: "Pure Science",
+    subjects: ["Tamil", "English", "Physics", "Chemistry", "Botany", "Zoology"]
+  },
+  {
+    id: "GROUP 4 – COMMERCE",
+    title: "Group 4 – Commerce",
+    badge: "Commerce",
+    subjects: ["Tamil", "English", "Statistics", "Economics", "Commerce", "Accountancy"]
+  },
+  {
+    id: "GROUP 5 – COMMERCE + COMPUTER APPLICATIONS",
+    title: "Group 5 – Commerce + Computer Applications",
+    badge: "Commerce + CA",
+    subjects: ["Tamil", "English", "Economics", "Commerce", "Accountancy", "Computer Applications"]
+  },
+  {
+    id: "GROUP 6 – COMMERCE + BUSINESS MATHEMATICS",
+    title: "Group 6 – Commerce + Business Mathematics",
+    badge: "Commerce + BM",
+    subjects: ["Tamil", "English", "Business Mathematics", "Economics", "Commerce", "Accountancy"]
+  },
+  {
+    id: "GROUP 7 – ACCOUNTANCY + HISTORY",
+    title: "Group 7 – Accountancy + History",
+    badge: "Acc + History",
+    subjects: ["Tamil", "English", "History", "Economics", "Commerce", "Accountancy"]
+  }
+];
+
+export const CBSE_GROUPS = [
+  {
+    id: "GROUP 1 – MATHS-BIOLOGY / BIO-MATHS",
+    title: "Group 1 – Maths-Biology / Bio-Maths",
+    badge: "Bio-Maths",
+    subjects: ["English", "Physics", "Chemistry", "Mathematics", "Biology"]
+  },
+  {
+    id: "GROUP 2 – MATHS + COMPUTER SCIENCE",
+    title: "Group 2 – Maths + Computer Science",
+    badge: "Maths + CS",
+    subjects: ["English", "Physics", "Chemistry", "Mathematics", "Computer Science"]
+  },
+  {
+    id: "GROUP 3 – PURE SCIENCE / BIOLOGY",
+    title: "Group 3 – Pure Science / Biology",
+    badge: "Pure Science",
+    subjects: ["English", "Physics", "Chemistry", "Biology"]
+  },
+  {
+    id: "GROUP 4 – COMMERCE",
+    title: "Group 4 – Commerce",
+    badge: "Commerce",
+    subjects: ["English", "Accountancy", "Business Studies", "Economics", "Mathematics"]
+  },
+  {
+    id: "GROUP 5 – COMMERCE + COMPUTER APPLICATIONS",
+    title: "Group 5 – Commerce + Computer Applications",
+    badge: "Commerce + IP",
+    subjects: ["English", "Accountancy", "Business Studies", "Economics", "Informatics Practices"]
+  },
+  {
+    id: "GROUP 6 – COMMERCE + BUSINESS MATHEMATICS",
+    title: "Group 6 – Commerce + Business Mathematics",
+    badge: "Commerce + BM",
+    subjects: ["English", "Accountancy", "Business Studies", "Economics", "Business Mathematics"]
+  },
+  {
+    id: "GROUP 7 – ACCOUNTANCY + HISTORY",
+    title: "Group 7 – Accountancy + History",
+    badge: "Acc + History",
+    subjects: ["English", "Accountancy", "History", "Economics", "Business Studies"]
+  }
+];
 
 export default function RegisterPage() {
   const { register, registerAdmin } = useAuth();
@@ -13,21 +101,24 @@ export default function RegisterPage() {
 
   // Selected Role: "STUDENT" | "ADMIN"
   const [role, setRole] = useState("STUDENT");
-  // Steps for STUDENT: 1 (School Name) -> 2 (Board) -> 3 (Standard) -> 4 (Username & Password)
-  // Steps for ADMIN:   1 (School Name) -> 4 (Username & Password)
+  // Steps for STUDENT: 1 (School) -> 2 (Board) -> 3 (Class) -> 4 (Group if 11-12) -> 5 (Username/Pass)
+  // Steps for ADMIN:   1 (School) -> 5 (Username/Pass)
   const [step, setStep] = useState(1);
 
   // Form Fields
-  const [schoolName, setSchoolName] = useState("");
-  const [board, setBoard] = useState("CBSE");
+  const [schoolName, setSchoolName] = useState("RPSIT School");
+  const [board, setBoard] = useState("STATE_BOARD");
   const [classLevel, setClassLevel] = useState(4);
+  const [studentGroup, setStudentGroup] = useState("GROUP 1 – MATHS-BIOLOGY / BIO-MATHS");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Step 1: School Name -> Next (goes to Step 2 for Student, or Step 4 for Admin)
+  const availableGroups = board === "CBSE" ? CBSE_GROUPS : TN_STATE_BOARD_GROUPS;
+
+  // Step 1: School Name -> Next
   const handleStep1Submit = (e) => {
     e.preventDefault();
     setError("");
@@ -35,28 +126,39 @@ export default function RegisterPage() {
       setError("Please enter your school name.");
       return;
     }
-    if (role === "STUDENT") {
-      setStep(2);
-    } else {
-      setStep(4);
-    }
+    setStep(2);
   };
 
-  // Step 2: Choose Board -> Next (Student only)
+  // Step 2: Choose Board -> Next
   const handleStep2Submit = (e) => {
     e.preventDefault();
     setError("");
-    setStep(3);
+    if (role === "ADMIN") {
+      setStep(5);
+    } else {
+      setStep(3);
+    }
   };
 
-  // Step 3: Choose Standard -> Next (Student only)
+  // Step 3: Choose Standard -> Next (If 11 or 12, go to Step 4 Group; else Step 5)
   const handleStep3Submit = (e) => {
     e.preventDefault();
     setError("");
-    setStep(4);
+    if (Number(classLevel) >= 11) {
+      setStep(4);
+    } else {
+      setStep(5);
+    }
   };
 
-  // Step 4: Final Submit (Username & Password)
+  // Step 4: Choose Group (Class 11 & 12 only) -> Next
+  const handleStep4Submit = (e) => {
+    e.preventDefault();
+    setError("");
+    setStep(5);
+  };
+
+  // Step 5: Final Submit (Username & Password)
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -69,15 +171,18 @@ export default function RegisterPage() {
           password,
           classLevel: Number(classLevel),
           board,
-          schoolName: schoolName.trim(),
+          schoolName: schoolName.trim() || "RPSIT School",
+          studentGroup: Number(classLevel) >= 11 ? studentGroup : null,
         };
         await register(payload);
         navigate("/lobby");
       } else {
+        localStorage.setItem("cq_admin_board", board);
         const payload = {
           username: username.trim(),
           password,
-          schoolName: schoolName.trim(),
+          board,
+          schoolName: schoolName.trim() || "RPSIT School",
         };
         await registerAdmin(payload);
         navigate("/admin");
@@ -110,7 +215,7 @@ export default function RegisterPage() {
         </svg>
       </div>
 
-      {/* Main Container Card matching Reference Layout */}
+      {/* Main Container Card */}
       <div className="login-modal-wrapper">
         {/* LEFT PANEL: Clean White Form Card */}
         <div className="login-form-card-container">
@@ -119,6 +224,9 @@ export default function RegisterPage() {
             <div className="card-top-green-accent" />
 
             <h1 className="login-heading-title">Create an Account</h1>
+            <p style={{ margin: "-8px 0 16px 0", fontSize: "13px", color: "#636e72", fontWeight: 600 }}>
+              {role === "STUDENT" ? "RPSIT School • Student Portal" : "RPSIT School • Admin Portal"}
+            </p>
 
             {error && <div className="error-banner">{error}</div>}
 
@@ -170,7 +278,7 @@ export default function RegisterPage() {
                     className="ref-input-control"
                     value={schoolName}
                     onChange={(e) => setSchoolName(e.target.value)}
-                    placeholder="Enter School Name"
+                    placeholder="Enter School Name (e.g. RPSIT School)"
                     required
                     autoFocus
                   />
@@ -184,7 +292,7 @@ export default function RegisterPage() {
             )}
 
             {/* ========================================================
-                STEP 2: CHOOSE BOARD (CBSE / State Board)
+                STEP 2: CHOOSE BOARD (CBSE / Tamil Nadu State Board)
                 ======================================================== */}
             {step === 2 && (
               <form onSubmit={handleStep2Submit} className="login-form-elements">
@@ -202,8 +310,8 @@ export default function RegisterPage() {
                     style={{ cursor: "pointer" }}
                     autoFocus
                   >
-                    <option value="CBSE">Choose Board: CBSE</option>
-                    <option value="STATE_BOARD">Choose Board: State Board</option>
+                    <option value="STATE_BOARD">State Board</option>
+                    <option value="CBSE">CBSE</option>
                   </select>
                 </div>
 
@@ -225,7 +333,7 @@ export default function RegisterPage() {
             )}
 
             {/* ========================================================
-                STEP 3: CHOOSE STANDARD / CLASS
+                STEP 3: CHOOSE STANDARD / CLASS (Class 4 to 12)
                 ======================================================== */}
             {step === 3 && (
               <form onSubmit={handleStep3Submit} className="login-form-elements">
@@ -245,15 +353,15 @@ export default function RegisterPage() {
                     style={{ cursor: "pointer" }}
                     autoFocus
                   >
-                    <option value={4}>Choose Standard: Class 4th</option>
-                    <option value={5}>Choose Standard: Class 5th</option>
-                    <option value={6}>Choose Standard: Class 6th</option>
-                    <option value={7}>Choose Standard: Class 7th</option>
-                    <option value={8}>Choose Standard: Class 8th</option>
-                    <option value={9}>Choose Standard: Class 9th</option>
-                    <option value={10}>Choose Standard: Class 10th</option>
-                    <option value={11}>Choose Standard: Class 11th</option>
-                    <option value={12}>Choose Standard: Class 12th</option>
+                    <option value={4}>Standard: Class 4th</option>
+                    <option value={5}>Standard: Class 5th</option>
+                    <option value={6}>Standard: Class 6th</option>
+                    <option value={7}>Standard: Class 7th</option>
+                    <option value={8}>Standard: Class 8th</option>
+                    <option value={9}>Standard: Class 9th</option>
+                    <option value={10}>Standard: Class 10th</option>
+                    <option value={11}>Standard: Class 11th (Higher Secondary)</option>
+                    <option value={12}>Standard: Class 12th (Higher Secondary)</option>
                   </select>
                 </div>
 
@@ -275,9 +383,87 @@ export default function RegisterPage() {
             )}
 
             {/* ========================================================
-                STEP 4: USERNAME & PASSWORD -> CREATE ACCOUNT
+                STEP 4: SELECT GROUP (Class 11 & 12 ONLY)
                 ======================================================== */}
             {step === 4 && (
+              <form onSubmit={handleStep4Submit} className="login-form-elements">
+                <div style={{ marginBottom: "10px" }}>
+                  <label style={{ fontSize: "12px", fontWeight: 700, color: "#2d3436", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Select Class {classLevel} Group / Stream:
+                  </label>
+                </div>
+
+                <div className="ref-input-group">
+                  <span className="ref-input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
+                    </svg>
+                  </span>
+                  <select
+                    id="studentGroup"
+                    className="ref-input-control"
+                    value={studentGroup}
+                    onChange={(e) => setStudentGroup(e.target.value)}
+                    style={{ cursor: "pointer", fontSize: "13px" }}
+                    autoFocus
+                  >
+                    {availableGroups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Group Subjects Preview */}
+                <div style={{ background: "#f1f2f6", borderRadius: "10px", padding: "10px 12px", marginBottom: "14px", border: "1px solid #dfe4ea" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: "#747d8c", textTransform: "uppercase", marginBottom: "6px" }}>
+                    Included Core Subjects:
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {availableGroups.find((g) => g.id === studentGroup)?.subjects.map((sub, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          background: "#ffffff",
+                          color: "#2f3542",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "3px 8px",
+                          borderRadius: "6px",
+                          border: "1px solid #ced6e0",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                        }}
+                      >
+                        {sub}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost-pill"
+                    style={{ flex: "0 0 80px", height: "46px" }}
+                    onClick={() => setStep(3)}
+                  >
+                    Back
+                  </button>
+                  <button type="submit" className="btn-lime-submit" style={{ flex: 1 }}>
+                    <span>Next</span>
+                    <span className="btn-accent-notch" />
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* ========================================================
+                STEP 5: USERNAME & PASSWORD -> CREATE ACCOUNT
+                ======================================================== */}
+            {step === 5 && (
               <form onSubmit={handleFinalSubmit} className="login-form-elements">
                 <div className="ref-input-group">
                   <span className="ref-input-icon">
@@ -317,7 +503,11 @@ export default function RegisterPage() {
                     type="button"
                     className="btn btn-ghost-pill"
                     style={{ flex: "0 0 80px", height: "46px" }}
-                    onClick={() => (role === "STUDENT" ? setStep(3) : setStep(1))}
+                    onClick={() => {
+                      if (role === "ADMIN") setStep(1);
+                      else if (Number(classLevel) >= 11) setStep(4);
+                      else setStep(3);
+                    }}
                   >
                     Back
                   </button>
@@ -342,17 +532,6 @@ export default function RegisterPage() {
                   Log In
                 </Link>
               </span>
-
-              <a
-                href={GITHUB_REPO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-github-link"
-                title="View Source on GitHub"
-              >
-                <GitHubIcon size={16} />
-                <span>GitHub</span>
-              </a>
             </div>
           </div>
         </div>
@@ -378,7 +557,7 @@ export default function RegisterPage() {
           <div className="hero-mascot-container">
             <img
               src={mascotImg}
-              alt="Computer Quest Learning Mascot"
+              alt="LearnQuest RPSIT School Learning Mascot"
               className="mascot-raster-img"
             />
           </div>

@@ -47,7 +47,10 @@ public class AdminController {
         try {
             Admin result = adminService.login(
                     admin.getUsername(),
-                    admin.getPassword()
+                    admin.getPassword(),
+                    admin.getBoard(),
+                    admin.getSchoolName(),
+                    admin.getSchoolId()
             );
             return ResponseEntity.ok(result);
         } catch (RuntimeException e) {

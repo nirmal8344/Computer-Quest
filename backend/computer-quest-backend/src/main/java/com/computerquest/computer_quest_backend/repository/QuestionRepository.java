@@ -14,9 +14,25 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             Integer mission
     );
 
+    List<Question> findBySubjectAndUnitAndChapterAndMission(
+            String subject,
+            String unit,
+            String chapter,
+            Integer mission
+    );
+
     List<Question> findByBoardAndClassLevelAndUnitAndChapterAndMission(
             String board,
             Integer classLevel,
+            String unit,
+            String chapter,
+            Integer mission
+    );
+
+    List<Question> findByBoardAndClassLevelAndSubjectAndUnitAndChapterAndMission(
+            String board,
+            Integer classLevel,
+            String subject,
             String unit,
             String chapter,
             Integer mission
@@ -31,9 +47,28 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             Integer mission
     );
 
+    List<Question> findBySchool_IdAndBoardAndClassLevelAndSubjectAndUnitAndChapterAndMission(
+            Long schoolId,
+            String board,
+            Integer classLevel,
+            String subject,
+            String unit,
+            String chapter,
+            Integer mission
+    );
+
     List<Question> findBySchoolIsNullAndBoardAndClassLevelAndUnitAndChapterAndMission(
             String board,
             Integer classLevel,
+            String unit,
+            String chapter,
+            Integer mission
+    );
+
+    List<Question> findBySchoolIsNullAndBoardAndClassLevelAndSubjectAndUnitAndChapterAndMission(
+            String board,
+            Integer classLevel,
+            String subject,
             String unit,
             String chapter,
             Integer mission
@@ -47,6 +82,13 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     );
 
     List<Question> findBySchoolIsNullAndUnitAndChapterAndMission(
+            String unit,
+            String chapter,
+            Integer mission
+    );
+
+    List<Question> findBySchoolIsNullAndSubjectAndUnitAndChapterAndMission(
+            String subject,
             String unit,
             String chapter,
             Integer mission

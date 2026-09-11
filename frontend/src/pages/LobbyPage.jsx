@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { gameApi } from "../api/client";
 import SettingsModal from "../components/SettingsModal.jsx";
-import { GitHubIcon } from "../components/GameIcons.jsx";
+import SubjectSelectModal from "../components/SubjectSelectModal.jsx";
 import studentAvatarImg from "../assets/images/student_avatar.jpg";
 import mascotGirlImg from "../assets/images/lobby_girl_mascot.jpg";
 import "../styles/lobby.css";
-
-const GITHUB_REPO_URL = "https://github.com/nirmal8344/Computer-Quest";
 
 export default function LobbyPage() {
   const { user, logout } = useAuth();
@@ -16,6 +14,8 @@ export default function LobbyPage() {
   const [game, setGame] = useState(null);
   const [error, setError] = useState("");
   const [showSettings, setShowSettings] = useState(false);
+  const [showSubjectModal, setShowSubjectModal] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState(null);
 
   // Fetch real-time game progress from backend
   useEffect(() => {
@@ -24,7 +24,9 @@ export default function LobbyPage() {
       gameApi
         .getGameData(user.id)
         .then((data) => {
-          if (active) setGame(data);
+          if (active) {
+            setGame(data);
+          }
         })
         .catch((err) => {
           if (active) setError(err.message);
@@ -38,18 +40,31 @@ export default function LobbyPage() {
   const username = game?.username || user?.username || "Explorer";
   const boardName = game?.board || user?.board || "STATE_BOARD";
   const classLevel = game?.classLevel || user?.classLevel || 4;
+  const studentGroup = game?.studentGroup || user?.studentGroup || "";
+  const schoolName = game?.school?.name || user?.schoolName || "RPSIT School";
+  const totalXp = Number(game?.totalXp ?? game?.xp ?? user?.xp ?? 0);
 
-  // Dynamic XP & Level calculations connected directly to backend data
-  const totalXp = Number(game?.xp ?? user?.xp ?? 0);
-  const currentChapter = game?.currentChapter ?? 1;
-  const level = Math.max(1, currentChapter);
-  const currentLevelXp = totalXp % 500;
-  const targetXp = 500;
-  const xpProgressPercent = Math.min(100, Math.max(0, (currentLevelXp / targetXp) * 100));
+  const formatGroupDisplay = (grp) => {
+    if (!grp) return "";
+    if (grp.includes("GROUP 1") || grp.includes("BIO")) return "Bio-Maths";
+    if (grp.includes("GROUP 2") || grp.includes("COMPUTER")) return "Maths + CS";
+    if (grp.includes("GROUP 3") || grp.includes("PURE")) return "Pure Science";
+    if (grp.includes("GROUP 7") || grp.includes("HISTORY")) return "Acc + History";
+    if (grp.includes("GROUP 5") || grp.includes("APPLICATION")) return "Commerce + CA";
+    if (grp.includes("GROUP 6") || grp.includes("BUSINESS")) return "Commerce + BM";
+    if (grp.includes("GROUP 4") || grp.includes("COMMERCE")) return "Commerce";
+    return grp;
+  };
 
-  // START ADVENTURE: Directly opens Game Units / available learning units screen
+  // START ADVENTURE: Opens subject selector for intentional subject choice
   const handleStartAdventure = () => {
-    navigate("/map");
+    setShowSubjectModal(true);
+  };
+
+  const handleSelectSubject = (sub) => {
+    setSelectedSubject(sub);
+    setShowSubjectModal(false);
+    navigate(`/map?subject=${encodeURIComponent(sub.subjectName)}`);
   };
 
   return (
@@ -60,7 +75,7 @@ export default function LobbyPage() {
       <div className="lobby-ambient-bubble bubble-3" />
 
       {/* ========================================================
-          TOP BAR (Profile Card on Left + GitHub & Logout on Right)
+          TOP BAR: Student Profile Card + Logout
           ======================================================== */}
       <header className="lobby-top-bar">
         {/* Profile Card with Real Dynamic Backend Data */}
@@ -71,36 +86,19 @@ export default function LobbyPage() {
           <div className="profile-details-col">
             <span className="profile-username">{username}</span>
             <span className="profile-meta-sub">
-              {boardName} • Class {classLevel}th
+              {schoolName} • {boardName === "STATE_BOARD" ? "State Board" : "CBSE"} • Class {classLevel}th{Number(classLevel) >= 11 && studentGroup ? ` • ${formatGroupDisplay(studentGroup)}` : ""}
             </span>
             <div className="profile-xp-row">
               <span className="xp-star-icon">⭐</span>
-              <span className="xp-level-label">Level {level}</span>
-              <div className="xp-progress-track">
-                <div
-                  className="xp-progress-fill"
-                  style={{ width: `${xpProgressPercent}%` }}
-                />
-              </div>
               <span className="xp-counter-text">
-                {currentLevelXp} / {targetXp} XP
+                {totalXp.toLocaleString()} Total XP
               </span>
             </div>
           </div>
         </div>
 
-        {/* Top-Right Header Actions (GitHub + Logout) */}
+        {/* Top-Right Header Actions: Logout only */}
         <div className="lobby-header-actions">
-          <a
-            href={GITHUB_REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-lobby-github"
-            title="View on GitHub"
-          >
-            <GitHubIcon size={20} />
-          </a>
-
           <button
             className="btn-lobby-logout"
             title="Sign Out"
@@ -128,75 +126,32 @@ export default function LobbyPage() {
       </header>
 
       {/* ========================================================
-          CENTER HERO: Mascot Character + 3D Logo + Start Button
+          CENTER HERO: Mascot Character + Clean Logo + Start Button
           ======================================================== */}
       <main className="lobby-hero-center">
-        {/* Mascot Character Illustration - Fully Integrated & Resized */}
+        {/* Mascot Character Illustration */}
         <div className="lobby-mascot-pod">
           <img
             src={mascotGirlImg}
-            alt="Cheering Student Mascot"
+            alt="Learning Mascot"
             className="lobby-mascot-img"
           />
         </div>
 
-        {/* 3D Computer Quest Brand Logo */}
+        {/* Clean, Decent LearnQuest Title */}
         <div className="brand-logo-pod">
-          <div className="cap-stars-group">
-            {/* 3D Graduation Cap */}
-            <div className="grad-cap-box">
-              <svg width="56" height="42" viewBox="0 0 68 52" fill="none">
-                <polygon
-                  points="34 4 66 18 34 32 2 18"
-                  fill="#2c3e50"
-                  stroke="#1a252f"
-                  strokeWidth="2"
-                />
-                <polygon points="34 8 60 18 34 28 8 18" fill="#34495e" />
-                <path
-                  d="M16 25v12c0 8 8 12 18 12s18-4 18-12V25"
-                  fill="#2c3e50"
-                  stroke="#1a252f"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M18 26v10c0 6 7 10 16 10s16-4 16-10V26"
-                  fill="#34495e"
-                />
-                <path
-                  d="M22 36c4 3 8 4 12 4s8-1 12-4"
-                  stroke="#f1c40f"
-                  strokeWidth="2.5"
-                  fill="none"
-                />
-                <circle cx="34" cy="18" r="3" fill="#f1c40f" />
-                <path
-                  d="M34 18 C30 24 22 28 14 34"
-                  stroke="#f1c40f"
-                  strokeWidth="2.5"
-                  fill="none"
-                />
-                <rect x="11" y="33" width="6" height="10" rx="2" fill="#f39c12" />
-              </svg>
+          <div className="clean-brand-header">
+            <div className="clean-cap-badge">
+              <span>🎓</span>
             </div>
-            {/* 3 Glowing Golden Stars */}
-            <div className="golden-stars-trio">
-              <span className="star-trio star-left">⭐</span>
-              <span className="star-trio star-center">⭐</span>
-              <span className="star-trio star-right">⭐</span>
+            <h1 className="clean-game-title">
+              <span className="title-learn">Learn</span>
+              <span className="title-quest">Quest</span>
+            </h1>
+            <div className="clean-subtitle-pill">
+              <span className="subtitle-dot" />
+              <span className="subtitle-text">LEARNING ADVENTURE</span>
             </div>
-          </div>
-
-          {/* 3D Bubble Text Stack */}
-          <div className="bubble-title-stack">
-            <h1 className="bubble-text-computer">COMPUTER</h1>
-            <h2 className="bubble-text-quest">QUEST</h2>
-          </div>
-
-          {/* Learning Adventure Capsule Pill */}
-          <div className="learning-adventure-pill">
-            <span className="pill-dot-orange" />
-            <span className="pill-text-label">LEARNING ADVENTURE</span>
           </div>
         </div>
 
@@ -220,53 +175,38 @@ export default function LobbyPage() {
       </main>
 
       {/* ========================================================
-          BOTTOM ROW (3 Action Cards: View Map, Leaderboard, Settings)
+          BOTTOM ROW (3 Action Cards: Choose Subject, Leaderboard, Settings)
           ======================================================== */}
-      <footer className="lobby-cards-row">
-        {/* 1. VIEW MAP (Sky Blue) */}
+      <footer className="lobby-cards-row three-cards">
+        {/* 1. CHOOSE SUBJECT (Sky Blue) */}
         <button
           className="bottom-action-tile tile-blue"
-          onClick={() => navigate("/map")}
+          onClick={() => setShowSubjectModal(true)}
         >
           <div className="tile-icon-box">
             <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
               <path
-                d="M6 10L18 6L30 10L42 6V38L30 42L18 38L6 42V10Z"
+                d="M8 8H20C22.2 8 24 9.8 24 12V38C24 36.3 22.2 35 20 35H8V8Z"
                 fill="#ffffff"
-                stroke="#ffffff"
-                strokeWidth="2"
-                strokeLinejoin="round"
               />
               <path
-                d="M18 6V38"
-                stroke="#74b9ff"
-                strokeWidth="2.5"
-                strokeDasharray="3 3"
+                d="M40 8H28C25.8 8 24 9.8 24 12V38C24 36.3 25.8 35 28 35H40V8Z"
+                fill="#ffffff"
+                opacity="0.9"
               />
               <path
-                d="M30 10V42"
-                stroke="#74b9ff"
-                strokeWidth="2.5"
-                strokeDasharray="3 3"
-              />
-              <path
-                d="M8 20H16M20 28H28M32 18H40"
-                stroke="#a0e7ff"
-                strokeWidth="2"
+                d="M24 12V38"
+                stroke="#0984e3"
+                strokeWidth="3"
                 strokeLinecap="round"
               />
-              <circle
-                cx="24"
-                cy="20"
-                r="6"
-                fill="#eb4d4b"
-                stroke="#ffffff"
-                strokeWidth="2"
-              />
-              <circle cx="24" cy="20" r="2.5" fill="#ffffff" />
+              <line x1="12" y1="16" x2="18" y2="16" stroke="#74b9ff" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="12" y1="22" x2="18" y2="22" stroke="#74b9ff" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="30" y1="16" x2="36" y2="16" stroke="#74b9ff" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="30" y1="22" x2="36" y2="22" stroke="#74b9ff" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
           </div>
-          <span className="tile-title-text">VIEW MAP</span>
+          <span className="tile-title-text">CHOOSE SUBJECT</span>
         </button>
 
         {/* 2. LEADERBOARD (Royal Purple) */}
@@ -301,13 +241,6 @@ export default function LobbyPage() {
                 strokeWidth="4"
                 strokeLinecap="round"
               />
-              <path
-                d="M20 16H28"
-                stroke="#ffffff"
-                strokeWidth="2"
-                strokeLinecap="round"
-                opacity="0.8"
-              />
             </svg>
           </div>
           <span className="tile-title-text">LEADERBOARD</span>
@@ -335,12 +268,21 @@ export default function LobbyPage() {
                 strokeLinecap="round"
               />
               <circle cx="24" cy="24" r="13" stroke="#fed330" strokeWidth="4" />
-              <circle cx="24" cy="24" r="5" fill="#f7b731" />
             </svg>
           </div>
           <span className="tile-title-text">SETTINGS</span>
         </button>
       </footer>
+
+      {/* Subject Selection Modal */}
+      {showSubjectModal && (
+        <SubjectSelectModal
+          subjects={game?.subjects || []}
+          activeSubject={selectedSubject?.subjectName || ""}
+          onSelectSubject={handleSelectSubject}
+          onClose={() => setShowSubjectModal(false)}
+        />
+      )}
 
       {/* Settings Modal */}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}

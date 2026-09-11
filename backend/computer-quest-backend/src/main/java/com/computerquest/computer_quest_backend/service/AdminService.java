@@ -50,6 +50,17 @@ public class AdminService {
             admin.setSchool(school);
         }
 
+        if (admin.getBoard() != null) {
+            String b = admin.getBoard().trim();
+            if (b.equalsIgnoreCase("State Board") || b.equalsIgnoreCase("STATE_BOARD")) {
+                admin.setBoard("STATE_BOARD");
+            } else {
+                admin.setBoard("CBSE");
+            }
+        } else {
+            admin.setBoard("CBSE");
+        }
+
         return adminRepository.save(admin);
     }
 
@@ -86,6 +97,10 @@ public class AdminService {
     }
 
     public Admin login(String username, String password) {
+        return login(username, password, null, null, null);
+    }
+
+    public Admin login(String username, String password, String board, String schoolName, Long schoolId) {
         Admin admin = adminRepository
                 .findFirstByUsername(username)
                 .orElseThrow(() ->
@@ -93,6 +108,28 @@ public class AdminService {
 
         if (!admin.getPassword().equals(password)) {
             throw new RuntimeException("Invalid password");
+        }
+
+        // If admin does not have a school yet and login supplied one, associate it
+        if (admin.getSchool() == null) {
+            if (schoolId != null) {
+                admin.setSchool(schoolRepository.findById(schoolId).orElse(null));
+            } else if (schoolName != null && !schoolName.trim().isEmpty()) {
+                School school = schoolRepository.findByName(schoolName.trim())
+                        .orElseGet(() -> schoolRepository.save(new School(schoolName.trim())));
+                admin.setSchool(school);
+            }
+        }
+
+        // If board supplied at login, set it
+        if (board != null && !board.trim().isEmpty()) {
+            String b = board.trim();
+            if (b.equalsIgnoreCase("State Board") || b.equalsIgnoreCase("STATE_BOARD")) {
+                admin.setBoard("STATE_BOARD");
+            } else {
+                admin.setBoard("CBSE");
+            }
+            admin = adminRepository.save(admin);
         }
 
         return admin;

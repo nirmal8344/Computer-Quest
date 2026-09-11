@@ -83,15 +83,17 @@ public class SchoolClassService {
         }
 
         List<SchoolClass> classes = new ArrayList<>();
+        String targetBoard = (board != null && !board.trim().isEmpty()) ? board.trim() : null;
+
         if (schoolId != null) {
-            classes = board != null ? schoolClassRepository.findBySchool_IdAndBoard(schoolId, board)
+            classes = targetBoard != null ? schoolClassRepository.findBySchool_IdAndBoard(schoolId, targetBoard)
                     : schoolClassRepository.findBySchool_Id(schoolId);
         }
         if (classes.isEmpty()) {
-            classes = board != null ? schoolClassRepository.findBySchoolIsNullAndBoard(board)
+            classes = targetBoard != null ? schoolClassRepository.findBySchoolIsNullAndBoard(targetBoard)
                     : schoolClassRepository.findBySchoolIsNull();
         }
-        if (classes.isEmpty()) {
+        if (classes.isEmpty() && targetBoard == null) {
             classes = schoolClassRepository.findAll();
         }
 
@@ -100,18 +102,17 @@ public class SchoolClassService {
         for (SchoolClass sc : classes) {
             int lvl = sc.getClassLevel() != null ? sc.getClassLevel() : 0;
             if (lvl >= 4 && lvl <= 12) {
-                if (board != null) {
+                if (targetBoard == null || targetBoard.equalsIgnoreCase(sc.getBoard())) {
                     distinctMap.put(lvl, sc);
-                } else {
-                    distinctMap.putIfAbsent(lvl, sc);
                 }
             }
         }
 
-        // Ensure all standards 4th through 12th exist in the list
+        // Ensure all standards 4th through 12th exist in the list for the target board
+        String defaultBoardToUse = targetBoard != null ? targetBoard : "CBSE";
         for (int lvl = 4; lvl <= 12; lvl++) {
             if (!distinctMap.containsKey(lvl)) {
-                SchoolClass newClass = new SchoolClass(lvl + "th Standard", lvl, board != null ? board : "CBSE");
+                SchoolClass newClass = new SchoolClass(lvl + "th Standard", lvl, defaultBoardToUse);
                 try {
                     newClass = schoolClassRepository.save(newClass);
                 } catch (Exception ignored) {}

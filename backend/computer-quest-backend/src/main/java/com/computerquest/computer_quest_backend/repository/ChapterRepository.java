@@ -12,15 +12,27 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 
     List<Chapter> findByBoardAndClassLevel(String board, Integer classLevel);
 
+    List<Chapter> findByBoardAndClassLevelAndSubject(String board, Integer classLevel, String subject);
+
     Optional<Chapter> findByBoardAndClassLevelAndChapterNumber(String board, Integer classLevel, Integer chapterNumber);
+
+    Optional<Chapter> findByBoardAndClassLevelAndSubjectAndChapterNumber(String board, Integer classLevel, String subject, Integer chapterNumber);
 
     List<Chapter> findBySchool_IdAndBoardAndClassLevel(Long schoolId, String board, Integer classLevel);
 
+    List<Chapter> findBySchool_IdAndBoardAndClassLevelAndSubject(Long schoolId, String board, Integer classLevel, String subject);
+
     List<Chapter> findBySchoolIsNullAndBoardAndClassLevel(String board, Integer classLevel);
+
+    List<Chapter> findBySchoolIsNullAndBoardAndClassLevelAndSubject(String board, Integer classLevel, String subject);
 
     Optional<Chapter> findBySchool_IdAndBoardAndClassLevelAndChapterNumber(Long schoolId, String board, Integer classLevel, Integer chapterNumber);
 
+    Optional<Chapter> findBySchool_IdAndBoardAndClassLevelAndSubjectAndChapterNumber(Long schoolId, String board, Integer classLevel, String subject, Integer chapterNumber);
+
     Optional<Chapter> findBySchoolIsNullAndBoardAndClassLevelAndChapterNumber(String board, Integer classLevel, Integer chapterNumber);
+
+    Optional<Chapter> findBySchoolIsNullAndBoardAndClassLevelAndSubjectAndChapterNumber(String board, Integer classLevel, String subject, Integer chapterNumber);
 
     List<Chapter> findBySchool_Id(Long schoolId);
 

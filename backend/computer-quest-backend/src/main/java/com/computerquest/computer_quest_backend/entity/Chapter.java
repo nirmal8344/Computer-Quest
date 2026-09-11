@@ -10,6 +10,7 @@ public class Chapter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String subject;
     private String unit;
     private Integer chapterNumber;
     private String chapterName;
@@ -42,12 +43,30 @@ public class Chapter {
     public Chapter() {
     }
 
+    public Chapter(String subject, String unit, Integer chapterNumber, String chapterName, Boolean unlocked, String board, Integer classLevel) {
+        this.subject = subject;
+        this.unit = unit;
+        this.chapterNumber = chapterNumber;
+        this.chapterName = chapterName;
+        this.unlocked = unlocked;
+        this.board = board;
+        this.classLevel = classLevel;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getUnit() {

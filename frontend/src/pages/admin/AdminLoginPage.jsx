@@ -7,6 +7,8 @@ import "../../styles/admin.css";
 export default function AdminLoginPage() {
   const { adminLogin } = useAuth();
   const navigate = useNavigate();
+  const [schoolName, setSchoolName] = useState("RPSIT School");
+  const [board, setBoard] = useState("CBSE");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,7 +19,8 @@ export default function AdminLoginPage() {
     setError("");
     setBusy(true);
     try {
-      await adminLogin(username, password);
+      localStorage.setItem("cq_admin_board", board);
+      await adminLogin(username, password, board, schoolName);
       navigate("/admin");
     } catch (err) {
       setError(err.message || "Invalid admin credentials.");
@@ -38,6 +41,40 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="admin-login-form">
           {error && <div className="error-banner">{error}</div>}
+
+          <div className="admin-field">
+            <label htmlFor="schoolName">School Name</label>
+            <input
+              id="schoolName"
+              type="text"
+              value={schoolName}
+              onChange={(e) => setSchoolName(e.target.value)}
+              placeholder="e.g. RPSIT School"
+              required
+            />
+          </div>
+
+          <div className="admin-field">
+            <label htmlFor="board">Board</label>
+            <select
+              id="board"
+              value={board}
+              onChange={(e) => setBoard(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                background: "rgba(15, 23, 42, 0.8)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: "8px",
+                color: "#fff",
+                fontSize: "1rem",
+                fontWeight: "600"
+              }}
+            >
+              <option value="CBSE">CBSE</option>
+              <option value="STATE_BOARD">State Board</option>
+            </select>
+          </div>
 
           <div className="admin-field">
             <label htmlFor="username">Admin Username</label>

@@ -445,16 +445,151 @@
   border-radius: 0 0 4px 4px;
 }
 
+.lobby-streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid #ff9f43;
+  border-radius: 20px;
+  padding: clamp(4px, 0.8vh, 8px) clamp(10px, 1.2vw, 16px);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 159, 67, 0.2);
+  transition: all 0.2s ease;
+}
+
+.lobby-streak-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 159, 67, 0.35);
+}
+
+.streak-flame-icon {
+  font-size: 1.2rem;
+  animation: pulseFlame 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseFlame {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+.streak-count-text {
+  font-size: clamp(0.75rem, 1.3vh, 0.88rem);
+  font-weight: 800;
+  color: #e67e22;
+}
+
+.lobby-current-subject-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid #0984e3;
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-top: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(9, 132, 227, 0.15);
+  transition: all 0.2s;
+}
+
+.lobby-current-subject-pill:hover {
+  transform: translateY(-1px);
+  background: #f0f7ff;
+  box-shadow: 0 6px 16px rgba(9, 132, 227, 0.25);
+}
+
+.subject-pill-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.subject-pill-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0984e3;
+}
+
+/* Clean Brand Header & Title */
+.clean-brand-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 6px;
+}
+
+.clean-cap-badge {
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+}
+
+.clean-game-title {
+  font-family: 'Fredoka', 'Outfit', sans-serif;
+  font-size: clamp(2rem, 4.2vh, 2.8rem);
+  font-weight: 800;
+  margin: 0;
+  padding: 0;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.title-learn {
+  color: #2563eb;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title-quest {
+  color: #ff7e5f;
+  background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.clean-subtitle-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 3px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.subtitle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff7e5f;
+}
+
+.subtitle-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.06em;
+}
+
 /* =========================================================
-   3. BOTTOM ROW (3 Action Tiles: View Map, Leaderboard, Settings)
+   3. BOTTOM ACTION CARDS ROW (3 Items: Choose Subject, Leaderboard, Settings)
    ========================================================= */
 .lobby-cards-row {
   width: 100%;
-  max-width: 600px;
-  display: flex;
+  max-width: 620px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.8vw, 18px);
+  gap: clamp(8px, 1.4vw, 16px);
   position: relative;
   z-index: 10;
   flex-shrink: 0;
@@ -462,11 +597,10 @@
 
 /* Bottom Action Tile */
 .bottom-action-tile {
-  flex: 1;
-  max-width: 170px;
+  width: 100%;
   border: none;
   border-radius: clamp(12px, 1.8vh, 18px);
-  padding: clamp(6px, 1.2vh, 12px) clamp(6px, 1vw, 12px);
+  padding: clamp(6px, 1.2vh, 12px) clamp(4px, 0.8vw, 10px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -475,11 +609,11 @@
   cursor: pointer;
   color: #ffffff;
   font-family: 'Fredoka', sans-serif;
-  font-size: clamp(0.72rem, 1.4vh, 0.88rem);
+  font-size: clamp(0.68rem, 1.2vh, 0.82rem);
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   transition: all 0.14s ease;
-  min-height: clamp(52px, 8.5vh, 76px);
+  min-height: clamp(50px, 8vh, 72px);
 }
 
 .tile-icon-box {
@@ -489,11 +623,11 @@
 }
 
 .tile-icon-box svg {
-  width: clamp(22px, 3.5vh, 32px);
-  height: clamp(22px, 3.5vh, 32px);
+  width: clamp(20px, 3.2vh, 28px);
+  height: clamp(20px, 3.2vh, 28px);
 }
 
-/* 1. Sky Blue - View Map */
+/* 1. Sky Blue - Choose Subject */
 .tile-blue {
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
   box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #0369a1,
@@ -511,7 +645,25 @@
   box-shadow: 0 1px 0 #0369a1;
 }
 
-/* 2. Royal Purple - Leaderboard */
+/* 2. Emerald Green - Achievements */
+.tile-green {
+  background: linear-gradient(180deg, #2ecc71 0%, #10ac84 100%);
+  box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #0e8365,
+              0 clamp(6px, 1.2vh, 12px) rgba(16, 172, 132, 0.28);
+}
+
+.tile-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 clamp(5px, 0.8vh, 8px) 0 #0e8365,
+              0 clamp(8px, 1.5vh, 15px) rgba(16, 172, 132, 0.38);
+}
+
+.tile-green:active {
+  transform: translateY(clamp(2px, 0.5vh, 4px));
+  box-shadow: 0 1px 0 #0e8365;
+}
+
+/* 3. Royal Purple - Leaderboard */
 .tile-purple {
   background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
   box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #6d28d9,
@@ -529,7 +681,7 @@
   box-shadow: 0 1px 0 #6d28d9;
 }
 
-/* 3. Warm Amber - Settings */
+/* 4. Warm Amber - Settings */
 .tile-orange {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
   box-shadow: 0 clamp(3px, 0.6vh, 6px) 0 #b45309,
@@ -555,58 +707,188 @@
 /* =========================================================
    RESPONSIVE DEVICE ADJUSTMENTS (Mobile, Tablet, Laptop, Desktop)
    ========================================================= */
-@media (min-width: 1200px) {
+
+/* Large Desktop / Ultra-Wide Monitors (> 1440px) */
+@media (min-width: 1440px) {
+  .lobby-top-bar {
+    max-width: 1000px;
+  }
   .lobby-hero-center {
-    max-width: 580px;
+    max-width: 620px;
+  }
+  .lobby-mascot-pod {
+    width: 160px;
+    height: 160px;
+  }
+  .clean-game-title {
+    font-size: 3rem;
+  }
+  .btn-start-adventure-hero {
+    padding: 14px 46px;
+    font-size: 1.3rem;
+  }
+  .lobby-cards-row {
+    max-width: 720px;
+    gap: 18px;
+  }
+  .bottom-action-tile {
+    min-height: 76px;
+    font-size: 0.88rem;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1199px) {
+/* Laptops & Standard Desktops (1024px to 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .lobby-top-bar {
+    max-width: 860px;
+  }
   .lobby-hero-center {
-    flex-direction: column;
-    gap: clamp(8px, 1.8vh, 18px);
+    max-width: 520px;
+  }
+  .lobby-cards-row {
+    max-width: 620px;
   }
 }
 
+/* Tablets & Small Laptops (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lobby-game-viewport {
+    padding: clamp(10px, 2vh, 20px) 20px;
+  }
+  .lobby-top-bar {
+    max-width: 700px;
+  }
+  .lobby-hero-center {
+    max-width: 480px;
+    gap: clamp(8px, 1.5vh, 16px);
+  }
+  .lobby-cards-row {
+    max-width: 560px;
+    gap: 12px;
+  }
+}
+
+/* Mobile Devices & Small Tablets (max-width: 767px) */
 @media (max-width: 767px) {
   .lobby-game-viewport {
-    padding: clamp(6px, 1.2vh, 14px) clamp(8px, 2vw, 16px) clamp(6px, 1.2vh, 14px);
+    padding: clamp(8px, 1.4vh, 14px) clamp(10px, 3vw, 16px);
     overflow-y: auto;
+    justify-content: space-between;
+  }
+  .lobby-top-bar {
+    max-width: 100%;
   }
   .lobby-profile-card {
-    max-width: calc(100vw - 110px);
+    max-width: calc(100vw - 80px);
+    padding: 4px 10px 4px 6px;
+    gap: 8px;
+  }
+  .profile-details-col {
+    max-width: calc(100vw - 150px);
+  }
+  .profile-username {
+    font-size: 0.88rem;
+  }
+  .profile-meta-sub {
+    font-size: 0.66rem;
   }
   .lobby-hero-center {
-    gap: clamp(4px, 1vh, 10px);
+    max-width: 100%;
+    gap: clamp(6px, 1.2vh, 12px);
+    margin: clamp(4px, 1vh, 12px) 0;
+  }
+  .lobby-mascot-pod {
+    width: clamp(80px, 16vh, 115px);
+    height: clamp(80px, 16vh, 115px);
+  }
+  .clean-game-title {
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+  }
+  .btn-start-adventure-hero {
+    width: min(100%, 320px);
+    padding: 10px 24px;
+    font-size: 1rem;
+  }
+  .lobby-cards-row {
+    max-width: 100%;
+    gap: 8px;
+  }
+  .bottom-action-tile {
+    min-height: 52px;
+    padding: 8px 4px;
+    font-size: 0.72rem;
+  }
+  .tile-icon-box svg {
+    width: 22px;
+    height: 22px;
   }
 }
 
-@media (max-height: 650px) {
+/* Extra Small Phones (max-width: 380px) */
+@media (max-width: 380px) {
+  .lobby-profile-card {
+    max-width: calc(100vw - 64px);
+  }
+  .profile-details-col {
+    max-width: 130px;
+  }
+  .profile-meta-sub {
+    font-size: 0.6rem;
+  }
+  .bottom-action-tile {
+    padding: 6px 2px;
+    min-height: 48px;
+    font-size: 0.64rem;
+  }
+  .tile-title-text {
+    letter-spacing: -0.02em;
+  }
+  .btn-start-adventure-hero {
+    padding: 8px 16px;
+    font-size: 0.92rem;
+  }
+}
+
+/* Short Height Viewports (Landscape Phones, Compact Laptops) */
+@media (max-height: 600px) {
   .lobby-game-viewport {
     overflow-y: auto;
     height: auto;
     min-height: 100vh;
     min-height: 100dvh;
     max-height: none;
-    gap: 12px;
+    gap: 8px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+  }
+  .lobby-hero-center {
+    margin: 4px 0;
+    gap: 4px;
   }
   .lobby-mascot-pod {
-    width: clamp(70px, 14vh, 110px);
-    height: clamp(70px, 14vh, 110px);
+    width: 68px;
+    height: 68px;
   }
-}
-
-@media (max-width: 380px) {
-  .profile-details-col {
-    max-width: 140px;
+  .clean-brand-header {
+    margin: 0;
+    gap: 2px;
   }
-  .bottom-action-tile {
-    padding: 6px 4px;
-    min-height: 48px;
-    font-size: 0.68rem;
+  .clean-cap-badge {
+    font-size: 1.2rem;
+  }
+  .clean-game-title {
+    font-size: 1.5rem;
+  }
+  .clean-subtitle-pill {
+    padding: 2px 10px;
   }
   .btn-start-adventure-hero {
-    padding: 8px 18px;
+    padding: 6px 20px;
     font-size: 0.88rem;
+    min-height: 38px;
+  }
+  .bottom-action-tile {
+    min-height: 44px;
+    padding: 4px;
   }
 }

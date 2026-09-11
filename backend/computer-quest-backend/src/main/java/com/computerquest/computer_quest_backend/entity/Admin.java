@@ -22,6 +22,8 @@ public class Admin {
     @JoinColumn(name = "school_id")
     private School school;
 
+    private String board;
+
     @Transient
     private String schoolName;
 
@@ -34,6 +36,21 @@ public class Admin {
     public Admin(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public Admin(String username, String password, School school, String board) {
+        this.username = username;
+        this.password = password;
+        this.school = school;
+        this.board = board;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public void setBoard(String board) {
+        this.board = board;
     }
 
     public Long getId() {

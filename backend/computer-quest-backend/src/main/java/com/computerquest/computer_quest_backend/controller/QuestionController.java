@@ -26,6 +26,7 @@ public class QuestionController {
 
     @GetMapping
     public List<Question> getQuestions(
+            @RequestParam(required = false) String subject,
             @RequestParam(required = false) String unit,
             @RequestParam(required = false) String chapter,
             @RequestParam(required = false) Integer mission,
@@ -35,7 +36,7 @@ public class QuestionController {
             @RequestParam(required = false) Long adminId,
             @RequestParam(required = false) Long schoolId) {
 
-        return questionService.getQuestions(unit, chapter, mission, board, classLevel, userId, adminId, schoolId);
+        return questionService.getQuestions(subject, unit, chapter, mission, board, classLevel, userId, adminId, schoolId);
     }
 
     @PutMapping("/{id}")
@@ -47,9 +48,11 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteQuestion(@PathVariable Long id) {
+    public String deleteQuestion(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long adminId) {
 
-        questionService.deleteQuestion(id);
+        questionService.deleteQuestion(id, adminId);
 
         return "Question deleted successfully";
     }

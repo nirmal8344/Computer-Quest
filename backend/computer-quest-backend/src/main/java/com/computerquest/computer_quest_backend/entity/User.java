@@ -1,6 +1,7 @@
 package com.computerquest.computer_quest_backend.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -19,6 +20,10 @@ public class User {
     private String role;
     private Integer classLevel;
     private String board;
+    private String studentGroup;
+
+    private Integer streakDays;
+    private LocalDate lastActiveDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "school_id")
@@ -79,6 +84,30 @@ public class User {
 
     public void setBoard(String board) {
         this.board = board;
+    }
+
+    public String getStudentGroup() {
+        return studentGroup;
+    }
+
+    public void setStudentGroup(String studentGroup) {
+        this.studentGroup = studentGroup;
+    }
+
+    public Integer getStreakDays() {
+        return streakDays != null ? streakDays : 1;
+    }
+
+    public void setStreakDays(Integer streakDays) {
+        this.streakDays = streakDays;
+    }
+
+    public LocalDate getLastActiveDate() {
+        return lastActiveDate;
+    }
+
+    public void setLastActiveDate(LocalDate lastActiveDate) {
+        this.lastActiveDate = lastActiveDate;
     }
 
     public School getSchool() {

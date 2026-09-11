@@ -81,20 +81,21 @@ public class ChapterService {
         return chapterRepository.findAll();
     }
 
-    public List<Chapter> getChapters(String board, Integer classLevel, Long userId, Long adminId, Long schoolId) {
+    public List<Chapter> getChapters(String board, Integer classLevel, String subject, Long userId, Long adminId, Long schoolId) {
         if (adminId != null) {
             Admin admin = adminRepository.findById(adminId).orElse(null);
             if (admin != null && admin.getSchool() != null) {
-                return chapterRepository.findBySchool_Id(admin.getSchool().getId());
+                schoolId = admin.getSchool().getId();
+                if (board == null) board = admin.getBoard();
             }
         }
 
         if (userId != null) {
             User user = userRepository.findById(userId).orElse(null);
             if (user != null) {
-                board = user.getBoard();
-                classLevel = user.getClassLevel();
-                if (user.getSchool() != null) {
+                if (board == null) board = user.getBoard();
+                if (classLevel == null) classLevel = user.getClassLevel();
+                if (schoolId == null && user.getSchool() != null) {
                     schoolId = user.getSchool().getId();
                 }
             }
@@ -102,41 +103,40 @@ public class ChapterService {
 
         List<Chapter> rawResult = new ArrayList<>();
         if (schoolId != null) {
-            if (board != null && classLevel != null) {
-                List<Chapter> schoolChapters = chapterRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
-                if (!schoolChapters.isEmpty()) {
-                    rawResult = schoolChapters;
-                }
+            if (board != null && classLevel != null && subject != null && !subject.trim().isEmpty()) {
+                rawResult = chapterRepository.findBySchool_IdAndBoardAndClassLevelAndSubject(schoolId, board, classLevel, subject.trim());
+            } else if (board != null && classLevel != null) {
+                rawResult = chapterRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
             } else {
-                List<Chapter> schoolChapters = chapterRepository.findBySchool_Id(schoolId);
-                if (!schoolChapters.isEmpty()) {
-                    rawResult = schoolChapters;
-                }
+                rawResult = chapterRepository.findBySchool_Id(schoolId);
             }
+
             if (rawResult.isEmpty()) {
-                if (board != null && classLevel != null) {
-                    List<Chapter> nullSchool = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
-                    if (!nullSchool.isEmpty()) {
-                        rawResult = nullSchool;
-                    } else {
-                        List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
-                        if (!anySchool.isEmpty()) {
-                            rawResult = anySchool;
-                        }
+                if (board != null && classLevel != null && subject != null && !subject.trim().isEmpty()) {
+                    rawResult = chapterRepository.findBySchoolIsNullAndBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                    if (rawResult.isEmpty()) {
+                        rawResult = chapterRepository.findByBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
                     }
-                }
-                if (rawResult.isEmpty()) {
+                } else if (board != null && classLevel != null) {
+                    rawResult = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                    if (rawResult.isEmpty()) {
+                        rawResult = chapterRepository.findByBoardAndClassLevel(board, classLevel);
+                    }
+                } else {
                     rawResult = chapterRepository.findBySchoolIsNull();
                 }
             }
         } else if (board != null && classLevel != null) {
-            List<Chapter> filtered = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
-            if (!filtered.isEmpty()) {
-                rawResult = filtered;
-            } else {
-                List<Chapter> anySchool = chapterRepository.findByBoardAndClassLevel(board, classLevel);
-                if (!anySchool.isEmpty()) {
-                    rawResult = anySchool;
+            if (subject != null && !subject.trim().isEmpty()) {
+                rawResult = chapterRepository.findBySchoolIsNullAndBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                if (rawResult.isEmpty()) {
+                    rawResult = chapterRepository.findByBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                }
+            }
+            if (rawResult.isEmpty()) {
+                rawResult = chapterRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
+                if (rawResult.isEmpty()) {
+                    rawResult = chapterRepository.findByBoardAndClassLevel(board, classLevel);
                 }
             }
         }
@@ -156,19 +156,44 @@ public class ChapterService {
         return result;
     }
 
+    public List<Chapter> getChapters(String board, Integer classLevel, Long userId, Long adminId, Long schoolId) {
+        return getChapters(board, classLevel, null, userId, adminId, schoolId);
+    }
+
     public Chapter updateChapter(Long id, Chapter chapter) {
-        Chapter existingChapter = chapterRepository
-                .findById(id)
+        Chapter existing = chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chapter not found"));
 
-        chapter.setId(existingChapter.getId());
+        if (chapter.getAdminId() != null) {
+            Admin admin = adminRepository.findById(chapter.getAdminId()).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot modify chapter of another school.");
+                }
+            }
+        }
+
+        chapter.setId(existing.getId());
         resolveSchool(chapter);
         return chapterRepository.save(chapter);
     }
 
     public void deleteChapter(Long id) {
+        deleteChapter(id, null);
+    }
+
+    public void deleteChapter(Long id, Long adminId) {
         Chapter existing = chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chapter not found"));
+
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot delete chapter of another school.");
+                }
+            }
+        }
 
         // Delete child missions
         List<Mission> missions = missionRepository.findByChapter_Id(existing.getId());

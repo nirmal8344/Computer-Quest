@@ -5,6 +5,7 @@ public class AnswerRequest {
     private Long questionId;
     private Long userId;
     private String answer;
+    private String subject;
 
     public AnswerRequest() {
     }
@@ -31,5 +32,13 @@ public class AnswerRequest {
 
     public void setAnswer(String answer) {
         this.answer = answer;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }

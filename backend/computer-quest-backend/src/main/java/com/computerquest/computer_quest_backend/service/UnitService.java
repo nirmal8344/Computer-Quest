@@ -57,21 +57,21 @@ public class UnitService {
         return unitRepository.findAll();
     }
 
-    public List<Unit> getUnits(String board, Integer classLevel, Long userId, Long adminId, Long schoolId) {
+    public List<Unit> getUnits(String board, Integer classLevel, String subject, Long userId, Long adminId, Long schoolId) {
         // If query is by admin, scope to admin's school
         if (adminId != null) {
             Admin admin = adminRepository.findById(adminId).orElse(null);
             if (admin != null && admin.getSchool() != null) {
-                return unitRepository.findBySchool_Id(admin.getSchool().getId());
+                schoolId = admin.getSchool().getId();
             }
         }
 
         if (userId != null) {
             User user = userRepository.findById(userId).orElse(null);
             if (user != null) {
-                board = user.getBoard();
-                classLevel = user.getClassLevel();
-                if (user.getSchool() != null) {
+                if (board == null) board = user.getBoard();
+                if (classLevel == null) classLevel = user.getClassLevel();
+                if (schoolId == null && user.getSchool() != null) {
                     schoolId = user.getSchool().getId();
                 }
             }
@@ -79,28 +79,32 @@ public class UnitService {
 
         List<Unit> rawResult = new ArrayList<>();
         if (schoolId != null) {
-            if (board != null && classLevel != null) {
-                List<Unit> schoolUnits = unitRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
-                if (!schoolUnits.isEmpty()) {
-                    rawResult = schoolUnits;
-                }
+            if (board != null && classLevel != null && subject != null && !subject.trim().isEmpty()) {
+                rawResult = unitRepository.findBySchool_IdAndBoardAndClassLevelAndSubject(schoolId, board, classLevel, subject.trim());
+            } else if (board != null && classLevel != null) {
+                rawResult = unitRepository.findBySchool_IdAndBoardAndClassLevel(schoolId, board, classLevel);
             } else {
-                List<Unit> schoolUnits = unitRepository.findBySchool_Id(schoolId);
-                if (!schoolUnits.isEmpty()) {
-                    rawResult = schoolUnits;
-                }
+                rawResult = unitRepository.findBySchool_Id(schoolId);
             }
+
             if (rawResult.isEmpty()) {
-                if (board != null && classLevel != null) {
+                if (board != null && classLevel != null && subject != null && !subject.trim().isEmpty()) {
+                    rawResult = unitRepository.findBySchoolIsNullAndBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                } else if (board != null && classLevel != null) {
                     rawResult = unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
                 } else {
                     rawResult = unitRepository.findBySchoolIsNull();
                 }
             }
         } else if (board != null && classLevel != null) {
-            List<Unit> units = unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
-            if (!units.isEmpty()) {
-                rawResult = units;
+            if (subject != null && !subject.trim().isEmpty()) {
+                rawResult = unitRepository.findBySchoolIsNullAndBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                if (rawResult.isEmpty()) {
+                    rawResult = unitRepository.findByBoardAndClassLevelAndSubject(board, classLevel, subject.trim());
+                }
+            }
+            if (rawResult.isEmpty()) {
+                rawResult = unitRepository.findBySchoolIsNullAndBoardAndClassLevel(board, classLevel);
             }
         }
 
@@ -119,22 +123,45 @@ public class UnitService {
         return result;
     }
 
-    public Unit updateUnit(Long id, Unit unit) {
+    public List<Unit> getUnits(String board, Integer classLevel, Long userId, Long adminId, Long schoolId) {
+        return getUnits(board, classLevel, null, userId, adminId, schoolId);
+    }
 
-        Unit existingUnit = unitRepository
+    public Unit updateUnit(Long id, Unit unit) {
+        Unit existing = unitRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Unit not found"));
 
-        unit.setId(existingUnit.getId());
+        if (unit.getAdminId() != null) {
+            Admin admin = adminRepository.findById(unit.getAdminId()).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot modify unit of another school.");
+                }
+            }
+        }
 
+        unit.setId(existing.getId());
+        resolveSchool(unit);
         return unitRepository.save(unit);
     }
 
     public void deleteUnit(Long id) {
+        deleteUnit(id, null);
+    }
 
-        if (!unitRepository.existsById(id)) {
-            throw new RuntimeException("Unit not found");
+    public void deleteUnit(Long id, Long adminId) {
+        Unit existing = unitRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Unit not found"));
+
+        if (adminId != null) {
+            Admin admin = adminRepository.findById(adminId).orElse(null);
+            if (admin != null && admin.getSchool() != null && existing.getSchool() != null) {
+                if (!admin.getSchool().getId().equals(existing.getSchool().getId())) {
+                    throw new RuntimeException("Unauthorized: Cannot delete unit of another school.");
+                }
+            }
         }
 
         unitRepository.deleteById(id);

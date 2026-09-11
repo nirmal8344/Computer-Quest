@@ -29,7 +29,18 @@ public class AuthService {
             user.setRole("STUDENT");
         }
 
-        // Resolve School if provided by nested school object, schoolId, or schoolName
+        // Group handling: strictly only for classes 11 and 12
+        if (user.getClassLevel() != null && user.getClassLevel() >= 11) {
+            if (user.getStudentGroup() == null || user.getStudentGroup().trim().isEmpty()) {
+                user.setStudentGroup("GROUP 1 – MATHS-BIOLOGY / BIO-MATHS");
+            } else {
+                user.setStudentGroup(user.getStudentGroup().trim());
+            }
+        } else {
+            user.setStudentGroup(null);
+        }
+
+        // Resolve School: default to RPSIT School if not specified
         if (user.getSchool() != null) {
             if (user.getSchool().getId() != null) {
                 School school = schoolRepository.findById(user.getSchool().getId()).orElse(null);
@@ -45,6 +56,11 @@ public class AuthService {
             user.setSchool(school);
         } else if (user.getSchoolName() != null && !user.getSchoolName().trim().isEmpty()) {
             String name = user.getSchoolName().trim();
+            School school = schoolRepository.findByName(name)
+                    .orElseGet(() -> schoolRepository.save(new School(name)));
+            user.setSchool(school);
+        } else {
+            String name = "RPSIT School";
             School school = schoolRepository.findByName(name)
                     .orElseGet(() -> schoolRepository.save(new School(name)));
             user.setSchool(school);

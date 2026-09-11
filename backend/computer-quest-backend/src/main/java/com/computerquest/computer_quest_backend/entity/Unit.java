@@ -13,6 +13,7 @@ public class Unit {
     private String unitName;
     private Integer unitNumber;
 
+    private String subject;
     private String board;
     private Integer classLevel;
 
@@ -52,9 +53,18 @@ public class Unit {
         this.classLevel = classLevel;
     }
 
-    public Unit(String unitName, Integer unitNumber, String board, Integer classLevel, School school) {
+    public Unit(String unitName, Integer unitNumber, String subject, String board, Integer classLevel) {
         this.unitName = unitName;
         this.unitNumber = unitNumber;
+        this.subject = subject;
+        this.board = board;
+        this.classLevel = classLevel;
+    }
+
+    public Unit(String unitName, Integer unitNumber, String subject, String board, Integer classLevel, School school) {
+        this.unitName = unitName;
+        this.unitNumber = unitNumber;
+        this.subject = subject;
         this.board = board;
         this.classLevel = classLevel;
         this.school = school;
@@ -82,6 +92,14 @@ public class Unit {
 
     public void setUnitNumber(Integer unitNumber) {
         this.unitNumber = unitNumber;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getBoard() {

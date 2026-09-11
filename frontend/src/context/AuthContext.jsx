@@ -37,13 +37,14 @@ export function AuthProvider({ children }) {
     return result;
   }, []);
 
-  const register = useCallback(async ({ username, password, classLevel, board, schoolId, schoolName }) => {
+  const register = useCallback(async ({ username, password, classLevel, board, schoolId, schoolName, studentGroup }) => {
     const payload = {
       username,
       password,
       role: "STUDENT",
       classLevel,
       board,
+      studentGroup: Number(classLevel) >= 11 ? studentGroup : null,
     };
 
     // Attach school info — prefer existing schoolId; fall back to schoolName for new schools
@@ -51,6 +52,8 @@ export function AuthProvider({ children }) {
       payload.schoolId = schoolId;
     } else if (schoolName) {
       payload.schoolName = schoolName;
+    } else {
+      payload.schoolName = "RPSIT School";
     }
 
     const newUser = await authApi.register(payload);
@@ -58,8 +61,11 @@ export function AuthProvider({ children }) {
     return newUser;
   }, []);
 
-  const adminLogin = useCallback(async (username, password) => {
-    const result = await adminApi.login(username, password);
+  const adminLogin = useCallback(async (username, password, board, schoolName) => {
+    const payload = typeof username === "object" && username !== null
+      ? username
+      : { username, password, board, schoolName };
+    const result = await adminApi.login(payload);
     if (!result || !result.id) {
       throw new Error("Invalid admin credentials.");
     }
@@ -67,8 +73,9 @@ export function AuthProvider({ children }) {
     return result;
   }, []);
 
-  const registerAdmin = useCallback(async ({ username, password, schoolId, schoolName }) => {
+  const registerAdmin = useCallback(async ({ username, password, schoolId, schoolName, board }) => {
     const payload = { username, password };
+    if (board) payload.board = board;
     if (schoolId) payload.schoolId = schoolId;
     else if (schoolName) payload.schoolName = schoolName;
 

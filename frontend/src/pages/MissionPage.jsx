@@ -44,8 +44,11 @@ export default function MissionPage() {
   // Resolve unit/chapterName if page loaded directly
   useEffect(() => {
     if (meta && meta.chapterId) return;
+    const params = new URLSearchParams(location.search);
+    const searchSubject = params.get("subject") || location.state?.subject || "";
+
     chapterApi
-      .getAll({ userId: user?.id })
+      .getAll({ userId: user?.id, subject: searchSubject })
       .then((chapters) => {
         if (!chapters || chapters.length === 0) throw new Error("No chapters available.");
         const ch =
@@ -60,6 +63,7 @@ export default function MissionPage() {
           chapterId: ch.id,
           unit: ch.unit || "Unit 1",
           chapterName: ch.chapterName,
+          subject: prev?.subject || searchSubject || ch.subject?.subjectName || "Computer Science",
           missionNumber: Number(missionNumber) || 1,
           gameType:
             prev?.gameType ||
@@ -71,12 +75,12 @@ export default function MissionPage() {
         }));
       })
       .catch((err) => setError(err.message));
-  }, [meta, chapterId, missionNumber, user?.id]);
+  }, [meta, chapterId, missionNumber, user?.id, location.search, location.state]);
 
   const loadQuestions = () => {
     if (!meta || !user?.id) return;
     questionApi
-      .getForMission(meta.unit, meta.chapterName, meta.missionNumber, { userId: user?.id })
+      .getForMission(meta.unit, meta.chapterName, meta.missionNumber, { userId: user?.id, subject: meta.subject })
       .then((raw) => {
         const cleaned = raw.map(({ correctAnswer, ...rest }) => rest);
         setQuestions(cleaned);
@@ -100,7 +104,7 @@ export default function MissionPage() {
     setSubmitting(true);
     setError("");
     try {
-      const res = await questionApi.submitAnswer(current.id, user.id, selected);
+      const res = await questionApi.submitAnswer(current.id, user.id, selected, meta?.subject);
       setXp(res.xp);
       setLives(res.lives);
 
@@ -127,7 +131,8 @@ export default function MissionPage() {
   const handleBackToMap = () => {
     const uId = meta?.unitId || 1;
     const cId = meta?.chapterId || chapterId || 1;
-    navigate(`/map?unitId=${uId}&chapterId=${cId}`);
+    const subj = meta?.subject || "";
+    navigate(`/map?unitId=${uId}&chapterId=${cId}${subj ? `&subject=${encodeURIComponent(subj)}` : ""}`);
   };
 
   // Shared Top Controls Bar
@@ -366,7 +371,7 @@ export default function MissionPage() {
           </div>
 
           <div className="question-topic-sub">
-            [{meta.board || "CBSE"} Class {meta.classLevel || 11}] {meta.chapterName}
+            [{meta.board || user?.board || "CBSE"} Class {meta.classLevel || user?.classLevel || ""}] {meta.subject ? `${meta.subject} · ` : ""}{meta.chapterName}
           </div>
 
           <h2 className="question-headline-text">{current.questionText}</h2>

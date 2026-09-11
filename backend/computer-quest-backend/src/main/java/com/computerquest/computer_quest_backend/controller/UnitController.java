@@ -26,10 +26,11 @@ public class UnitController {
     public List<Unit> getAllUnits(
             @RequestParam(required = false) String board,
             @RequestParam(required = false) Integer classLevel,
+            @RequestParam(required = false) String subject,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long adminId,
             @RequestParam(required = false) Long schoolId) {
-        return unitService.getUnits(board, classLevel, userId, adminId, schoolId);
+        return unitService.getUnits(board, classLevel, subject, userId, adminId, schoolId);
     }
 
     @PutMapping("/{id}")
@@ -41,9 +42,9 @@ public class UnitController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteUnit(@PathVariable Long id) {
+    public String deleteUnit(@PathVariable Long id, @RequestParam(required = false) Long adminId) {
 
-        unitService.deleteUnit(id);
+        unitService.deleteUnit(id, adminId);
 
         return "Unit deleted successfully";
     }

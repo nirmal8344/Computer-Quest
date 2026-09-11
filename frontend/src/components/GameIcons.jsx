@@ -261,6 +261,23 @@ export function QuestNavIcon({ size = 22 }) {
   );
 }
 
+export function FlameIcon({ className = "", size = 20 }) {
+  return (
+    <svg className={`game-icon-svg ${className}`} viewBox="0 0 24 24" width={size} height={size}>
+      <defs>
+        <linearGradient id="flameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#ef4444" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M12 2c-.5 2-2 3.5-3 5.5C7.5 10.5 7 13 8 16c.8 2.5 3 4 5 4 3 0 5-2 5-5 0-3.5-2.5-6-3-8-.3 1-.7 2-1.5 2.5C13.5 8 13 5 12 2z"
+        fill="url(#flameGrad)"
+      />
+    </svg>
+  );
+}
+
 export function GitHubIcon({ size = 20, className = "" }) {
   return (
     <svg className={`game-icon-svg ${className}`} viewBox="0 0 24 24" width={size} height={size} fill="currentColor">

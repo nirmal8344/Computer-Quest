@@ -1,4 +1,4 @@
-// Thin fetch wrapper mapped 1:1 to the existing Spring Boot endpoints.
+// Thin fetch wrapper mapped 1:1 to the Spring Boot endpoints.
 
 const getBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
@@ -65,9 +65,39 @@ export const schoolApi = {
   getAll: () => request("/api/schools"),
 };
 
+// ----- Subjects (/api/subjects) -----
+export const subjectApi = {
+  getSubjects: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/subjects${query ? `?${query}` : ""}`);
+  },
+  getForStudent: (userId) => request(`/api/subjects?userId=${userId}`),
+  createSubject: (subject) =>
+    request("/api/subjects", { method: "POST", body: JSON.stringify(subject) }),
+  updateSubject: (id, subject) =>
+    request(`/api/subjects/${id}`, { method: "PUT", body: JSON.stringify(subject) }),
+  deleteSubject: (id) =>
+    request(`/api/subjects/${id}`, { method: "DELETE" }),
+};
+
+// ----- Leaderboard (/api/leaderboard) -----
+export const leaderboardApi = {
+  getLeaderboard: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/leaderboard${query ? `?${query}` : ""}`);
+  },
+  getRankings: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/leaderboard/rankings${query ? `?${query}` : ""}`);
+  },
+};
+
 // ----- Game (/api/game) -----
 export const gameApi = {
-  getGameData: (userId) => request(`/api/game/${userId}`),
+  getGameData: (userId, params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/game/${userId}${query ? `?${query}` : ""}`);
+  },
 };
 
 // ----- Profile (/api/profile) -----
@@ -128,10 +158,10 @@ export const questionApi = {
     });
     return request(`/api/questions?${searchParams.toString()}`);
   },
-  submitAnswer: (questionId, userId, answer) =>
+  submitAnswer: (questionId, userId, answer, subject = null) =>
     request("/api/questions/answer", {
       method: "POST",
-      body: JSON.stringify({ questionId, userId, answer }),
+      body: JSON.stringify({ questionId, userId, answer, subject }),
     }),
   createQuestion: (question) =>
     request("/api/questions", { method: "POST", body: JSON.stringify(question) }),
@@ -139,14 +169,6 @@ export const questionApi = {
     request(`/api/questions/${id}`, { method: "PUT", body: JSON.stringify(question) }),
   deleteQuestion: (id) =>
     request(`/api/questions/${id}`, { method: "DELETE" }),
-};
-
-// ----- Leaderboard (/api/leaderboard) -----
-export const leaderboardApi = {
-  getLeaderboard: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
-    return request(`/api/leaderboard${query ? `?${query}` : ""}`);
-  },
 };
 
 // ----- Player progress (/api/progress) -----
@@ -176,16 +198,28 @@ export const classApi = {
 export const adminApi = {
   createAdmin: (admin) =>
     request("/api/admin", { method: "POST", body: JSON.stringify(admin), timeout: 90000 }),
-  login: (username, password) =>
-    request("/api/admin/login", {
+  login: (usernameOrPayload, password) => {
+    let payload;
+    if (typeof usernameOrPayload === "object" && usernameOrPayload !== null) {
+      payload = usernameOrPayload;
+    } else {
+      payload = { username: usernameOrPayload, password };
+    }
+    return request("/api/admin/login", {
       method: "POST",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(payload),
       timeout: 90000,
-    }),
+    });
+  },
   getClasses: classApi.getClasses,
   createClass: classApi.createClass,
   updateClass: classApi.updateClass,
   deleteClass: classApi.deleteClass,
+
+  getSubjects: subjectApi.getSubjects,
+  createSubject: subjectApi.createSubject,
+  updateSubject: subjectApi.updateSubject,
+  deleteSubject: subjectApi.deleteSubject,
 
   getUnits: unitApi.getUnits,
   createUnit: unitApi.createUnit,
